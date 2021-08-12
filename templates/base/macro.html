@@ -1,0 +1,28 @@
+{% macro pagination(page, max) %}
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+
+  <ul class="pagination-list">
+    
+    {% if page > 4 %}
+    <li><a class="pagination-link {{ 'is-current' if idx == page}}" aria-label="Page {{ page }}" data-page="1">1</a></li>
+    {% if page > 5 %}
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    {% endif %}	
+    {% endif %}	
+
+    {% for idx in range(page-3, page+4) %}
+    {% if idx >= 1 and idx <= max %}
+    <li><a class="pagination-link {{ 'is-current' if idx == page}}" aria-label="Page {{ page }}" data-page="{{ idx }}">{{ idx }}</a></li>
+    {% endif %}
+    {% endfor %}
+
+    {% if page <= max-4 %}
+    {% if page < max-4 %}
+    <li><span class="pagination-ellipsis">&hellip;</span></li>
+    {% endif %}	
+    <li><a class="pagination-link {{ 'is-current' if idx == page}}" aria-label="Page {{ page }}" data-page="{{ max }}">{{ max }}</a></li>
+    {% endif %}	
+    
+  </ul>
+</nav>
+{% endmacro %}

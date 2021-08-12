@@ -1,0 +1,29 @@
+/* home - left panel */
+
+#main-panel {
+	width: 25%; 
+	margin: 10px;
+	margin-bottom: 50px;
+}
+
+#main-panel > .panel-heading{
+	font-size: 1.5vw;	
+}
+
+.field > label {
+	margin-right: 10px;
+}
+
+#logFC-threshold {
+	width: 80%;
+	margin-left: 20px;
+}
+
+#dmp-display-table {
+	margin-bottom: 50px;
+}
+
+.pagination {
+	margin: auto;
+	width: 80%;
+}

@@ -1,3 +1,175 @@
 {% extends "base/layout.html" %} 
 {% block main%}
+<div class="columns">
+	<nav class="panel column is-one-quarter" id="main-panel">
+	  <p class="panel-heading">
+	    Differential Methylation Positions (DMPs) Overview
+	  </p>
+
+	  <p class="panel-tabs">
+	    <a class="is-active">Colorectal</a>
+	    <a>Bladder</a>
+	  </p>
+
+	  <div class="panel-block">
+	  	<div class="field">
+	  		<label><b>Race:</b></label>
+
+			  <input class="is-checkradio" id="race-radio-asian" type="radio" name="race-radio" checked="checked">
+			  <label for="race-radio-asian">Asian</label>
+
+			  <input class="is-checkradio" id="race-radio-black" type="radio" name="race-radio">
+			  <label for="race-radio-black">Black</label>
+
+			  <input class="is-checkradio" id="race-radio-white" type="radio" name="race-radio">
+			  <label for="race-radio-white">White</label>
+			</div>
+	  </div>
+
+	  <div class="panel-block">
+	    <p class="control has-icons-left">
+	      <input class="input" type="text" placeholder="Search">
+	      <span class="icon is-left">
+	        <i class="fas fa-search" aria-hidden="true"></i>
+	      </span>
+	    </p>
+	  </div>
+
+	  <div class="panel-block">
+		  <div class="field">
+			  <input class="is-checkradio" id="search-filter-radio-probe" type="radio" name="search-filter-radio" checked="checked">
+			  <label for="search-filter-radio-probe">Probe ID</label>
+
+			  <input class="is-checkradio" id="search-filter-radio-gene" type="radio" name="search-filter-radio">
+			  <label for="search-filter-radio-gene">Gene name</label>
+			</div>
+		</div>
+
+	  
+	  <p class="panel-block">
+	  	<p style="text-align: center;">abs(logFC) threshold</p>
+	    <input class="slider is-fullwidth" id="logFC-threshold" step="0.01" min="0" max="1" value="0.5" type="range">
+	  </p>
+	  
+
+	  <a class="panel-block is-active">
+	    <span class="panel-icon">
+	      <i class="fas fa-book" aria-hidden="true"></i>
+	    </span>
+	    bulma
+	  </a>
+	 
+	  <a class="panel-block">
+	    <span class="panel-icon">
+	      <i class="fas fa-code-branch" aria-hidden="true"></i>
+	    </span>
+	    daniellowtw/infboard
+	  </a>
+	  <a class="panel-block">
+	    <span class="panel-icon">
+	      <i class="fas fa-code-branch" aria-hidden="true"></i>
+	    </span>
+	    mojs
+	  </a>
+	  <label class="panel-block">
+	    <input type="checkbox">
+	    remember me
+	  </label>
+	  <div class="panel-block">
+	    <button class="button is-link is-outlined is-fullwidth">
+	      Reset all filters
+	    </button>
+	  </div>
+	</nav>
+
+	<section class="column">
+		<div class="tabs is-boxed">
+		  <ul>
+		    <li class="is-active">
+		      <a>
+		        <span>DMPs table</span>
+		      </a>
+		    </li>
+		    <li>
+		      <a>
+		        <span>???</span>
+		      </a>
+		    </li>
+		    <li>
+		      <a>
+		        <span>???</span>
+		      </a>
+		    </li>
+		    <li>
+		      <a>
+		        <span>???</span>
+		      </a>
+		    </li>
+		  </ul>
+		</div>
+		<table class="table" id="dmp-display-table">
+		  <thead>
+		    <tr>
+		      <th>Probe ID</th>
+		      <th><abbr title="log2 fold change">logFC</abbr></th>
+		      <th><abbr title="t value">t</abbr></th>
+		      <th>P.Value</th>
+		      <th><abbr title="Chromosome">CHR</abbr></th>
+		      <th><abbr title="Map information">MAPINFO</abbr></th>
+		      <th>gene</th>
+		      <th>feat.cgi</th>
+		    </tr>
+		  </thead>
+		  
+		  <tbody>
+		  	{% for dmp in dmp_list %}
+		    <tr>
+		      <th>{{dmp.probe_id}}</th>
+		      <td>{{dmp.logFC}}</td>
+		      <td>{{dmp.t_val}}</td>
+		      <td>{{dmp.p_val}}</td>
+		      <td>{{dmp.chr}}</td>
+		      <td>{{dmp.coord}}</td>
+		      <td>{{dmp.gene}}</td>
+		      <td>{{dmp.feat_cgi}}</td>
+		      
+		    </tr>
+		    {% endfor %}
+		    
+		  </tbody>
+
+		</table>
+		{% from 'base/macro.html' import pagination %}
+		{% set page = page | int %}
+		{% set total_page = total_page | int %}
+		{{ pagination(page, total_page) }}
+		
+	</section>
+</div>
+
+<script type="text/javascript">
+	(function () {
+		$(".pagination-link").click(function(event) {
+      event.preventDefault();
+      var page = $(this).data("page")
+      $.cookie('page', page);
+
+    	$.ajax({
+    	  url: '{{ url_for("main.MainView") }}',
+	      type: 'GET',
+        success: function(response)
+        {
+        	var newDoc = document.open("text/html", "replace");
+					newDoc.write(response);
+					newDoc.close();
+        },
+        error: function(response)
+        {
+          console.log(response);
+        } 
+	    });
+    })
+	})();
+</script>
+
 {% endblock %}
