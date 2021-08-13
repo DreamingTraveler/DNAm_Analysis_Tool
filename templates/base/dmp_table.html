@@ -1,0 +1,56 @@
+<table class="table" id="dmp-display-table">
+  <thead>
+    <tr>
+      <th>Probe ID</th>
+      <th><abbr title="log2 fold change">logFC</abbr></th>
+      <th><abbr title="t value">t</abbr></th>
+      <th>P.Value</th>
+      <th><abbr title="Chromosome">CHR</abbr></th>
+      <th><abbr title="Map information">MAPINFO</abbr></th>
+      <th>gene</th>
+      <th>feat.cgi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dmp in dmp_list %}
+    <tr>
+      <th>{{dmp.probe_id}}</th>
+      <td>{{dmp.logFC}}</td>
+      <td>{{dmp.t_val}}</td>
+      <td>{{dmp.p_val}}</td>
+      <td>{{dmp.chr}}</td>
+      <td>{{dmp.coord}}</td>
+      <td>{{dmp.gene}}</td>
+      <td>{{dmp.feat_cgi}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% from 'base/pagination.html' import pagination %}
+{% set page = page | int %}
+{% set total_page = total_page | int %}
+{{ pagination(page, total_page) }}
+<script type="text/javascript">
+(function() {
+  $(".pagination-link").click(function(event) {
+    event.preventDefault();
+    var page = $(this).data("page")
+    $.cookie('page', page);
+
+    $.ajax({
+      url: '{{ url_for("main.MainView") }}',
+      type: 'POST',
+      success: function(response) {
+        //    	var newDoc = document.open("text/html", "replace");
+        // newDoc.write(response);
+        // newDoc.close();
+        $("#dmp-info-area").html(response)
+
+      },
+      error: function(response) {
+        console.log(response);
+      }
+    });
+  })
+})();
+</script>

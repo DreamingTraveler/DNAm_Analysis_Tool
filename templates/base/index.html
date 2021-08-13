@@ -6,9 +6,9 @@
 	    Differential Methylation Positions (DMPs) Overview
 	  </p>
 
-	  <p class="panel-tabs">
-	    <a class="is-active">Colorectal</a>
-	    <a>Bladder</a>
+	  <p class="panel-tabs" id="cancer-option">
+	    <a class="is-active" data-cancer-type="colorectal">Colorectal</a>
+	    <a data-cancer-type="bladder">Bladder</a>
 	  </p>
 
 	  <div class="panel-block">
@@ -28,7 +28,7 @@
 
 	  <div class="panel-block">
 	    <p class="control has-icons-left">
-	      <input class="input" type="text" placeholder="Search">
+	      <input class="input" id="search-dmp" type="text" placeholder="Search">
 	      <span class="icon is-left">
 	        <i class="fas fa-search" aria-hidden="true"></i>
 	      </span>
@@ -36,11 +36,11 @@
 	  </div>
 
 	  <div class="panel-block">
-		  <div class="field">
-			  <input class="is-checkradio" id="search-filter-radio-probe" type="radio" name="search-filter-radio" checked="checked">
+		  <div class="field" id="search-filter-options">
+			  <input class="is-checkradio" id="search-filter-radio-probe" type="radio" name="search-filter-radio" value="probe" checked="checked">
 			  <label for="search-filter-radio-probe">Probe ID</label>
 
-			  <input class="is-checkradio" id="search-filter-radio-gene" type="radio" name="search-filter-radio">
+			  <input class="is-checkradio" id="search-filter-radio-gene" type="radio" name="search-filter-radio" value="gene">
 			  <label for="search-filter-radio-gene">Gene name</label>
 			</div>
 		</div>
@@ -107,68 +107,86 @@
 		    </li>
 		  </ul>
 		</div>
-		<table class="table" id="dmp-display-table">
-		  <thead>
-		    <tr>
-		      <th>Probe ID</th>
-		      <th><abbr title="log2 fold change">logFC</abbr></th>
-		      <th><abbr title="t value">t</abbr></th>
-		      <th>P.Value</th>
-		      <th><abbr title="Chromosome">CHR</abbr></th>
-		      <th><abbr title="Map information">MAPINFO</abbr></th>
-		      <th>gene</th>
-		      <th>feat.cgi</th>
-		    </tr>
-		  </thead>
-		  
-		  <tbody>
-		  	{% for dmp in dmp_list %}
-		    <tr>
-		      <th>{{dmp.probe_id}}</th>
-		      <td>{{dmp.logFC}}</td>
-		      <td>{{dmp.t_val}}</td>
-		      <td>{{dmp.p_val}}</td>
-		      <td>{{dmp.chr}}</td>
-		      <td>{{dmp.coord}}</td>
-		      <td>{{dmp.gene}}</td>
-		      <td>{{dmp.feat_cgi}}</td>
-		      
-		    </tr>
-		    {% endfor %}
-		    
-		  </tbody>
-
-		</table>
-		{% from 'base/macro.html' import pagination %}
-		{% set page = page | int %}
-		{% set total_page = total_page | int %}
-		{{ pagination(page, total_page) }}
-		
+		<div id="dmp-info-area">
+			<table class="table" id="dmp-display-table">
+		    <thead>
+	        <tr>
+	          <th>Probe ID</th>
+            <th><abbr title="log2 fold change">logFC</abbr></th>
+            <th><abbr title="t value">t</abbr></th>
+            <th>P.Value</th>
+            <th><abbr title="Chromosome">CHR</abbr></th>
+            <th><abbr title="Map information">MAPINFO</abbr></th>
+            <th>gene</th>
+            <th>feat.cgi</th>
+	        </tr>
+		    </thead>
+		    <tbody>
+		      {% for dmp in dmp_list %}
+	        <tr>
+	            <th>{{dmp.probe_id}}</th>
+	            <td>{{dmp.logFC}}</td>
+	            <td>{{dmp.t_val}}</td>
+	            <td>{{dmp.p_val}}</td>
+	            <td>{{dmp.chr}}</td>
+	            <td>{{dmp.coord}}</td>
+	            <td>{{dmp.gene}}</td>
+	            <td>{{dmp.feat_cgi}}</td>
+	        </tr>
+		      {% endfor %}
+		    </tbody>
+			</table>
+			{% from 'base/pagination.html' import pagination %}
+			{% set page = page | int %}
+			{% set total_page = total_page | int %}
+			{{ pagination(page, total_page) }}
+		</div>
 	</section>
 </div>
 
 <script type="text/javascript">
 	(function () {
-		$(".pagination-link").click(function(event) {
-      event.preventDefault();
-      var page = $(this).data("page")
-      $.cookie('page', page);
-
-    	$.ajax({
+		function updateTableContent() {
+			$.ajax({
     	  url: '{{ url_for("main.MainView") }}',
-	      type: 'GET',
-        success: function(response)
+	      type: 'POST',
+        success: function(block)
         {
-        	var newDoc = document.open("text/html", "replace");
-					newDoc.write(response);
-					newDoc.close();
+					$("#dmp-info-area").html(block);
         },
         error: function(response)
         {
           console.log(response);
         } 
 	    });
+		}
+
+		$("#search-dmp, #search-filter-options").change(function() {
+			var inputText = $(this).val();
+			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
+			
+			$.cookie('searchFilterText', inputText);
+			$.cookie('searchFilterOption', searchFilterOpt);
+
+			updateTableContent();
+		})
+
+		$(".pagination-link").click(function(event) {
+      event.preventDefault();
+      var page = $(this).data("page");
+      $.cookie('page', page);
+      updateTableContent();
+    	
     })
+
+		$("#cancer-option > a").click(function() {
+			var cancerType = $(this).data("cancer-type");
+			$.cookie('cancerType', cancerType);
+
+			updateTableContent();
+		})
+
+
 	})();
 </script>
 
