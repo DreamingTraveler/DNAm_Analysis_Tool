@@ -146,6 +146,10 @@
 
 <script type="text/javascript">
 	(function () {
+		$.removeCookie('searchFilterText');
+		$.removeCookie('searchFilterOption');
+		updateTableContent();
+
 		function updateTableContent() {
 			$.ajax({
     	  url: '{{ url_for("main.MainView") }}',
@@ -161,11 +165,23 @@
 	    });
 		}
 
-		$("#search-dmp, #search-filter-options").change(function() {
+		$("#search-dmp").keyup(function() {
 			var inputText = $(this).val();
 			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
-			
+
+			$.cookie('page', 1);
 			$.cookie('searchFilterText', inputText);
+			$.cookie('searchFilterOption', searchFilterOpt);
+
+			updateTableContent();
+		})
+
+		$("#search-filter-options").change(function() {
+			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
+
+			$("#search-dmp").val("");
+			$.cookie('page', 1);
+			$.cookie('searchFilterText', "");
 			$.cookie('searchFilterOption', searchFilterOpt);
 
 			updateTableContent();
