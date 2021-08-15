@@ -56,6 +56,12 @@ class MainView(MethodView):
     def get_filter_dmp(self, df):
         filter_text = request.cookies.get('searchFilterText')
         filter_opt = request.cookies.get('searchFilterOption')
+        logFC_threshold = request.cookies.get('logFCThreshold')
+
+        if logFC_threshold == None:
+            logFC_threshold = 0.0
+        else:
+            logFC_threshold = float(logFC_threshold)
 
         if filter_text == "" or filter_text == " ":
             return df
@@ -66,10 +72,13 @@ class MainView(MethodView):
 
             return df[df["gene"].str.contains(filter_text, na=False)]
 
+        df = df[df["logFC"].abs() >= logFC_threshold]
+
         return df
 
     def get_data_from_csv(self):
         df = self.get_df_by_cancer_type()
+        df = df.fillna("")
         sub_df = df[config.SUB_DF_COLUMNS]
         filter_df = self.get_filter_dmp(sub_df)
         dmp_list = filter_df.values

@@ -48,9 +48,9 @@
 	  
 	  <p class="panel-block">
 	  	<p style="text-align: center;">abs(logFC) threshold</p>
-	    <input class="slider is-fullwidth" id="logFC-threshold" step="0.01" min="0" max="1" value="0.5" type="range">
+	    <input class="slider is-fullwidth" id="logFC-threshold" step="0.01" min="0" max="1" value="0" type="range">
+	    <p style="text-align: center;" id="threshold-val">Threshold value: 0 </p>
 	  </p>
-	  
 
 	  <a class="panel-block is-active">
 	    <span class="panel-icon">
@@ -107,6 +107,7 @@
 		    </li>
 		  </ul>
 		</div>
+		
 		<div id="dmp-info-area">
 			<table class="table" id="dmp-display-table">
 		    <thead>
@@ -148,6 +149,7 @@
 	(function () {
 		$.removeCookie('searchFilterText');
 		$.removeCookie('searchFilterOption');
+		$.removeCookie('logFCThreshold');
 		updateTableContent();
 
 		function updateTableContent() {
@@ -157,6 +159,7 @@
         success: function(block)
         {
 					$("#dmp-info-area").html(block);
+
         },
         error: function(response)
         {
@@ -183,6 +186,16 @@
 			$.cookie('page', 1);
 			$.cookie('searchFilterText', "");
 			$.cookie('searchFilterOption', searchFilterOpt);
+
+			updateTableContent();
+		})
+
+		$("#logFC-threshold").on("input", function() {
+			var threshold = $(this).val();
+
+			$.cookie('page', 1);
+			$.cookie('logFCThreshold', threshold);
+			$("#threshold-val").html("Threshold value: " + threshold)
 
 			updateTableContent();
 		})
