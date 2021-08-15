@@ -57,6 +57,8 @@ class MainView(MethodView):
         filter_text = request.cookies.get('searchFilterText')
         filter_opt = request.cookies.get('searchFilterOption')
         logFC_threshold = request.cookies.get('logFCThreshold')
+        is_hyper = request.cookies.get('isHyper')
+        is_hypo = request.cookies.get('isHypo')
 
         if logFC_threshold == None:
             logFC_threshold = 0.0
@@ -72,7 +74,17 @@ class MainView(MethodView):
 
             return df[df["gene"].str.contains(filter_text, na=False)]
 
+        # filter by logFC threshold
         df = df[df["logFC"].abs() >= logFC_threshold]
+
+        # filter by methylation status
+        if is_hyper == "false" and is_hypo == "false":
+            df = df.iloc[0:0]
+        elif is_hyper == "false":
+            df = df[df["logFC"] < 0]
+        elif is_hypo == "false":
+            df = df[df["logFC"] >= 0]
+
 
         return df
 

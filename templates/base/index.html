@@ -49,10 +49,18 @@
 	  <p class="panel-block">
 	  	<p style="text-align: center;">abs(logFC) threshold</p>
 	    <input class="slider is-fullwidth" id="logFC-threshold" step="0.01" min="0" max="1" value="0" type="range">
-	    <p style="text-align: center;" id="threshold-val">Threshold value: 0 </p>
+	    <p style="text-align: center; margin-bottom: 10px;" id="threshold-val">Threshold value: 0 </p>
+
+  		<div class="field" id="hyper-hypo-checker">
+			  <input id="is-hyper" type="checkbox" name="is-hyper" class="switch" checked="checked">
+			  <label for="is-hyper">Hyper</label>
+
+			  <input id="is-hypo" type="checkbox" name="is-hypo" class="switch" checked="checked">
+			  <label for="is-hypo">Hypo</label>
+			</div>
 	  </p>
 
-	  <a class="panel-block is-active">
+	  <!-- <a class="panel-block is-active">
 	    <span class="panel-icon">
 	      <i class="fas fa-book" aria-hidden="true"></i>
 	    </span>
@@ -70,11 +78,8 @@
 	      <i class="fas fa-code-branch" aria-hidden="true"></i>
 	    </span>
 	    mojs
-	  </a>
-	  <label class="panel-block">
-	    <input type="checkbox">
-	    remember me
-	  </label>
+	  </a> -->
+
 	  <div class="panel-block">
 	    <button class="button is-link is-outlined is-fullwidth">
 	      Reset all filters
@@ -109,7 +114,7 @@
 		</div>
 		
 		<div id="dmp-info-area">
-			<table class="table" id="dmp-display-table">
+			<table class="table is-striped" id="dmp-display-table">
 		    <thead>
 	        <tr>
 	          <th>Probe ID</th>
@@ -150,7 +155,14 @@
 		$.removeCookie('searchFilterText');
 		$.removeCookie('searchFilterOption');
 		$.removeCookie('logFCThreshold');
+
+		setMethyStatus(); // initialize the methylation status (use cookie to store)
 		updateTableContent();
+
+		function setMethyStatus() {
+			$.cookie('isHyper', $("#is-hyper").is(":checked"))
+			$.cookie('isHypo', $("#is-hypo").is(":checked"))
+		}
 
 		function updateTableContent() {
 			$.ajax({
@@ -197,6 +209,11 @@
 			$.cookie('logFCThreshold', threshold);
 			$("#threshold-val").html("Threshold value: " + threshold)
 
+			updateTableContent();
+		})
+
+		$("#is-hyper, #is-hypo").change(function() {
+			setMethyStatus()
 			updateTableContent();
 		})
 
