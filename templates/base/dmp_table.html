@@ -25,11 +25,26 @@
     </tr>
     {% endfor %}
   </tbody>
+
 </table>
+
+<div class="block">
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Probe: {{ probe_num }}
+	</div>
+
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Gene: {{ gene_num }}
+	</div>
+</div>
 {% from 'base/pagination.html' import pagination %}
 {% set page = page | int %}
 {% set total_page = total_page | int %}
 {{ pagination(page, total_page) }}
+
+
+
+
 <script type="text/javascript">
 (function() {
   $(".pagination-link").click(function(event) {
@@ -41,9 +56,7 @@
       url: '{{ url_for("main.MainView") }}',
       type: 'POST',
       success: function(response) {
-        //    	var newDoc = document.open("text/html", "replace");
-        // newDoc.write(response);
-        // newDoc.close();
+
         $("#dmp-info-area").html(response)
 
       },

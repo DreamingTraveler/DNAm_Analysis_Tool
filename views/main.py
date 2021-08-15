@@ -23,20 +23,24 @@ class DMP():
 
 class MainView(MethodView):
     def get(self):
-        dmp_class_list = self.get_data_from_csv()
+        filter_dmp_df, dmp_class_list = self.get_data_from_csv()
         page, max_dmp_num, dmp_per_page, total_page = self.get_page_info(dmp_class_list)
         dmp_class_sublist = self.get_dmp_list_for_target_page(page, max_dmp_num, dmp_per_page, dmp_class_list)
         
         return render_template('base/index.html', dmp_list=dmp_class_sublist, 
-            page=page, total_page=total_page)
+            page=page, total_page=total_page, probe_num=len(dmp_class_list), 
+            gene_num=filter_dmp_df["gene"].nunique())
 
     def post(self):
-        dmp_class_list = self.get_data_from_csv()
+        filter_dmp_df, dmp_class_list = self.get_data_from_csv()
         page, max_dmp_num, dmp_per_page, total_page = self.get_page_info(dmp_class_list)
         dmp_class_sublist = self.get_dmp_list_for_target_page(page, max_dmp_num, dmp_per_page, dmp_class_list)
+        probe_num = len(dmp_class_list)
+        gene_num = filter_dmp_df["gene"].nunique()
 
         return render_template('base/dmp_table.html', dmp_list=dmp_class_sublist, 
-            page=page, total_page=total_page)
+            page=page, total_page=total_page, probe_num=probe_num,
+            gene_num=gene_num)
 
     def get_df_by_cancer_type(self):
         input_csv = ""
@@ -53,10 +57,7 @@ class MainView(MethodView):
         filter_text = request.cookies.get('searchFilterText')
         filter_opt = request.cookies.get('searchFilterOption')
 
-        print(filter_text, filter_opt)
-
         if filter_text == "" or filter_text == " ":
-            print("FF")
             return df
 
         if filter_opt == "probe":
@@ -78,7 +79,7 @@ class MainView(MethodView):
             dmp_class = DMP(dmp)
             dmp_class_list.append(dmp_class)
 
-        return dmp_class_list
+        return filter_df, dmp_class_list
 
     def get_page_info(self, dmp_class_list):
         page = request.cookies.get('page') # get the current page number from cookie
@@ -89,8 +90,6 @@ class MainView(MethodView):
         max_dmp_num = len(dmp_class_list)
         dmp_per_page = 10
         total_page = int((max_dmp_num-1) / dmp_per_page) + 1
-
-        print(page, max_dmp_num, dmp_per_page, total_page)
         
         return page, max_dmp_num, dmp_per_page, total_page
 
