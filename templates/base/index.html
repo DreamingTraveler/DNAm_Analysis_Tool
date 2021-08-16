@@ -155,6 +155,7 @@
 		$.removeCookie('searchFilterText');
 		$.removeCookie('searchFilterOption');
 		$.removeCookie('logFCThreshold');
+		$.removeCookie('cancerType');
 
 		setMethyStatus(); // initialize the methylation status (use cookie to store)
 		updateTableContent();
@@ -213,6 +214,7 @@
 		})
 
 		$("#is-hyper, #is-hypo").change(function() {
+			$.cookie('page', 1);
 			setMethyStatus()
 			updateTableContent();
 		})

@@ -1,9 +1,11 @@
 import sys
 import os
+import io
 import config
 import util
 import pandas as pd
-from flask import Blueprint, request, abort, render_template, redirect, url_for, current_app
+from flask import Blueprint, request, abort, render_template, redirect, \
+ url_for, current_app, make_response
 from flask.views import MethodView
 
 
@@ -123,6 +125,27 @@ class MainView(MethodView):
         dmp_class_sublist = dmp_class_list[dmp_idx_begin:dmp_idx_end]
 
         return dmp_class_sublist
-        
+
+class SaveDMPView(MainView):
+    def get(self):
+        filter_df, dmp_class_list = super(SaveDMPView, self).get_data_from_csv()
+
+        out = io.BytesIO()
+        writer = pd.ExcelWriter(out, engine='xlsxwriter')
+        filter_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
+        writer.save()
+        writer.close()
+
+        # resp = make_response(filter_df.to_csv(index=False, encoding="utf-8"))
+        resp = make_response(out.getvalue())
+        resp.headers["Content-Disposition"] = "attachment; filename=dmp.xlsx"
+        # resp.headers["Content-Type"] = "text/csv"
+        resp.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        resp.headers["Set-Cookie"] = "fileDownload=true; path=/"
+
+        return resp
+
+                       
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
+blueprint.add_url_rule('/save', view_func=SaveDMPView.as_view(SaveDMPView.__name__))

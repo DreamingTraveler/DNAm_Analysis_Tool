@@ -36,6 +36,15 @@
 	<div class="box" style="width: 30%; display: inline-block;">
 		Number of Gene: {{ gene_num }}
 	</div>
+
+	<div id="save-dmp-table" style="float: right; margin-right: 7%;">
+		<div class="loader-wrapper">
+		    <div class="loader is-loading"></div>
+		    <p id="pls-wait-txt" style="font-size: 14px;">Please Wait...</p>
+		</div>
+		<button class="button is-primary is-light" id="export-df-btn">Export to xlsx</button>
+	</div>
+	
 </div>
 {% from 'base/pagination.html' import pagination %}
 {% set page = page | int %}
@@ -43,27 +52,58 @@
 {{ pagination(page, total_page) }}
 
 
-
-
 <script type="text/javascript">
 (function() {
+
+	function updateTableContent() {
+		$.ajax({
+  	  url: '{{ url_for("main.MainView") }}',
+      type: 'POST',
+      success: function(block)
+      {
+				$("#dmp-info-area").html(block);
+      },
+      error: function(response)
+      {
+        console.log(response);
+      } 
+    });
+	}
+
+	function setLoaderActive() {
+		$(".loader-wrapper").css("display", "block");
+  	$("#save-dmp-table > .loader-wrapper > .loader").css({
+  		"height" : "30px",
+  		"width" : "30px"
+  	})
+	}
+
   $(".pagination-link").click(function(event) {
     event.preventDefault();
     var page = $(this).data("page")
     $.cookie('page', page);
 
-    $.ajax({
-      url: '{{ url_for("main.MainView") }}',
-      type: 'POST',
-      success: function(response) {
-
-        $("#dmp-info-area").html(response)
-
-      },
-      error: function(response) {
-        console.log(response);
-      }
-    });
+    updateTableContent();
   })
+
+  $("#export-df-btn").click(function() {
+  	
+  	$(this).css("display", "none");
+
+  	$.fileDownload('{{ url_for("main.SaveDMPView") }}', {
+			httpMethod: 'GET',
+			prepareCallback:function(url) {
+         setLoaderActive()
+      },
+      successCallback: function() {
+      	$("#export-df-btn").css("display", "block");
+      	$(".loader-wrapper").css("display", "none");
+      },
+      failCallback: function() {
+      	alert("File download failed!"); 
+      }
+		});
+  })
+
 })();
 </script>
