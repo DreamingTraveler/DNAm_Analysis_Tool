@@ -1,6 +1,7 @@
 import sys
 import os
 import io
+import urllib
 import config
 import util
 import pandas as pd
@@ -48,10 +49,42 @@ class MainView(MethodView):
         input_csv = ""
         df = None
         cancer_type = request.cookies.get('cancerType')
+        race = request.cookies.get('raceOption')
+        stage = request.cookies.get('stageOption')
+
         if cancer_type == "bladder":
             df = dmp_tables.bladder_dmp_df
+
+            if race is not None:
+                if race == "asian":
+                    df = dmp_tables.bladder_asian_dmp_df
+                elif race == "white":
+                    df = dmp_tables.bladder_white_dmp_df
+                elif race == "black":
+                    df = dmp_tables.bladder_black_dmp_df
+
+            if stage is not None:
+                if stage == "early":
+                    df = dmp_tables.bladder_early_stage_dmp_df
+                elif stage == "late":
+                    df = dmp_tables.bladder_late_stage_dmp_df
+
         else:
             df = dmp_tables.colorectal_dmp_df
+
+            if race is not None:
+                if race == "asian":
+                    df = dmp_tables.colorectal_asian_dmp_df
+                elif race == "white":
+                    df = dmp_tables.colorectal_white_dmp_df
+                elif race == "black":
+                    df = dmp_tables.colorectal_black_dmp_df
+
+            if stage is not None:
+                if stage == "early":
+                    df = dmp_tables.colorectal_early_stage_dmp_df
+                elif stage == "late":
+                    df = dmp_tables.colorectal_late_stage_dmp_df
 
         return df
 
@@ -61,20 +94,15 @@ class MainView(MethodView):
         logFC_threshold = request.cookies.get('logFCThreshold')
         is_hyper = request.cookies.get('isHyper')
         is_hypo = request.cookies.get('isHypo')
+        rem_duplicate_genes = request.cookies.get('isDuplicateGenes')
+
+        # filter_text = urllib.parse.unquote(filter_text)
 
         if logFC_threshold == None:
             logFC_threshold = 0.0
         else:
             logFC_threshold = float(logFC_threshold)
 
-        if filter_text == "" or filter_text == " ":
-            return df
-
-        if filter_opt == "probe":
-            return df[df["Probe_ID"].str.contains(filter_text)]
-        elif filter_opt == "gene":
-
-            return df[df["gene"].str.contains(filter_text, na=False)]
 
         # filter by logFC threshold
         df = df[df["logFC"].abs() >= logFC_threshold]
@@ -87,6 +115,20 @@ class MainView(MethodView):
         elif is_hypo == "false":
             df = df[df["logFC"] >= 0]
 
+        # remove duplicate genes
+        if rem_duplicate_genes == "true":
+            df = df.sort_values(by="logFC", ascending=False, key=abs)
+            df = df.drop_duplicates(subset=["gene"])
+
+        if not filter_text:
+            return df
+
+        if filter_opt == "probe":
+            print(filter_text)
+            return df[df["Probe_ID"].str.contains(filter_text)]
+
+        elif filter_opt == "gene":
+            return df[df["gene"].str.contains(filter_text, na=False)]
 
         return df
 

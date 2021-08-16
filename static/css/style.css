@@ -15,6 +15,20 @@
 	margin-right: 10px;
 }
 
+#search-filter-block {
+	border-bottom: 5px solid #ededed !important;
+}
+
+#pheno-dropdown {
+	width: 50%;
+	margin-top: 15px;
+}
+
+.pheno-options {
+	display: none;
+	border-bottom: 5px solid #ededed !important;
+}
+
 #logFC-threshold {
 	width: 80%;
 	margin-left: 20px;
@@ -22,7 +36,7 @@
 
 #hyper-hypo-checker {
 	position: relative;
-	left: 10%;
+	/*left: 10%;*/
 	top: 5px;
 }
 
