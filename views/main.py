@@ -45,7 +45,7 @@ class MainView(MethodView):
             page=page, total_page=total_page, probe_num=probe_num,
             gene_num=gene_num)
 
-    def get_df_by_cancer_type(self):
+    def get_df_on_conditions(self):
         input_csv = ""
         df = None
         cancer_type = request.cookies.get('cancerType')
@@ -96,7 +96,7 @@ class MainView(MethodView):
         is_hypo = request.cookies.get('isHypo')
         rem_duplicate_genes = request.cookies.get('isDuplicateGenes')
 
-        # filter_text = urllib.parse.unquote(filter_text)
+        filter_text_list = []
 
         if logFC_threshold == None:
             logFC_threshold = 0.0
@@ -122,18 +122,20 @@ class MainView(MethodView):
 
         if not filter_text:
             return df
+        else:
+            filter_text_list = filter_text.split("%2C")
 
         if filter_opt == "probe":
-            print(filter_text)
-            return df[df["Probe_ID"].str.contains(filter_text)]
+            return df[df["Probe_ID"].str.contains('|'.join(filter_text_list))]
 
         elif filter_opt == "gene":
-            return df[df["gene"].str.contains(filter_text, na=False)]
+            # return df[df["gene"].str.contains('|'.join(filter_text_list), na=False)]
+            return df[df["gene"].isin(filter_text_list)]
 
         return df
 
     def get_data_from_csv(self):
-        df = self.get_df_by_cancer_type()
+        df = self.get_df_on_conditions()
         df = df.fillna("")
         sub_df = df[config.SUB_DF_COLUMNS]
         filter_df = self.get_filter_dmp(sub_df)

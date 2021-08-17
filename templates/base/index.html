@@ -12,13 +12,22 @@
 	  </p>
 
 	  <div class="panel-block">
+	  	<div class="control has-icons-left" id="search-dmp">
+				<input class="input" type="tags" placeholder="Search">
+				<span class="icon is-left">
+	        <i class="fas fa-search" aria-hidden="true"></i>
+	      </span>
+	    </div>
+		</div>
+
+	  <!-- <div class="panel-block">
 	    <p class="control has-icons-left">
 	      <input class="input" id="search-dmp" type="text" placeholder="Search">
 	      <span class="icon is-left">
 	        <i class="fas fa-search" aria-hidden="true"></i>
 	      </span>
 	    </p>
-	  </div>
+	  </div> -->
 
 	  <div class="panel-block" id="search-filter-block">
 		  <div class="field" id="search-filter-options">
@@ -199,6 +208,7 @@
 		$.removeCookie('isDuplicateGenes');
 		$.removeCookie('raceOption');
 		$.removeCookie('stageOption');
+		bulmaTagsinput.attach();
 
 		setMethyStatus(); // initialize the methylation status (use cookie to store)
 		updateTableContent();
@@ -244,13 +254,23 @@
 			updateTableContent();
 		}
 
+		// $("#search-dmp > input").on("input", function() {
+		//    alert($(this).val()); 
+		// });
+
+	
 		// search probe or gene 
-		$("#search-dmp").keyup(function() {
-			var inputText = $(this).val();
+		$("#search-dmp > input").on("change", function() {
 			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
+			var keywordList = [];
+
+			$("#search-dmp .control").each(function() {
+				var tagName = $(this).data("tag");
+				keywordList.push(tagName);
+			})
 
 			$.cookie('page', 1);
-			$.cookie('searchFilterText', inputText);
+			$.cookie('searchFilterText', keywordList);
 			$.cookie('searchFilterOption', searchFilterOpt);
 
 			updateTableContent();
@@ -259,9 +279,10 @@
 		$("#search-filter-options").change(function() {
 			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
 
-			$("#search-dmp").val("");
+			// $("#search-dmp > input").val("");
+			$("#search-dmp .tagsinput .control").remove();
 			$.cookie('page', 1);
-			$.cookie('searchFilterText', "");
+			$.removeCookie('searchFilterText');
 			$.cookie('searchFilterOption', searchFilterOpt);
 
 			updateTableContent();

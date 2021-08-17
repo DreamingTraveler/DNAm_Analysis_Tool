@@ -11,6 +11,18 @@
 	font-size: 1.5vw;	
 }
 
+.tagsinput {
+	height: auto !important;
+}
+
+.tagsinput > input {
+	margin-bottom: 0.75em;
+}
+
+.tagsinput span.tag {
+	background-color: #7cfcd433;
+}
+
 .field > label {
 	margin-right: 10px;
 }
