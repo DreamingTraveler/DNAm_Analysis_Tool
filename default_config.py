@@ -1,7 +1,8 @@
 DEBUG = True
 SECRET_KEY = 'c882369d7b66e8697426c3e8fb2675c0'
 
-SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "P.Value", "CHR", "MAPINFO", "gene", "feat.cgi"]
+SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "P.Value", "CHR", \
+"MAPINFO", "gene", "feat.cgi", "feature", "cgi"]
 
 # colorectal cancer DNAm analysis result files
 COLORECTAL_DMP_CSV = "static/data/colorectal/colorectal_DMP_analysis_result_TN.csv"

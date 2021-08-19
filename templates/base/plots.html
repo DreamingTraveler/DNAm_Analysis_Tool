@@ -1,0 +1,16 @@
+{% block plot %} 
+<div id="plot-display-area">
+	<div id="volcano-plot">
+		<img src="data:image/png;base64,{{ img_url }}">
+		<!-- {{ content }} -->
+	</div>
+</div>
+{% endblock %}
+
+<script type="text/javascript">
+(function() {
+	// var img = $("{{ content }}");
+	// img.appendTo("#volcano-plot");
+
+})();
+</script>

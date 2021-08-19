@@ -1,3 +1,4 @@
+{% block dmp_table %} 
 <table class="table is-striped" id="dmp-display-table">
   <thead>
     <tr>
@@ -40,9 +41,13 @@
 	<div id="save-dmp-table" style="float: right; margin-right: 7%;">
 		<div class="loader-wrapper">
 		    <div class="loader is-loading"></div>
-		    <p id="pls-wait-txt" style="font-size: 14px;">Please Wait...</p>
+		    <p id="pls-wait-txt" style="font-size: 14px; text-align: center;">Please Wait...</p>
 		</div>
-		<button class="button is-primary is-light" id="export-df-btn">Export to xlsx</button>
+		<div id="save-file-btns" style="display: flex; flex-direction: column; justify-content: center;">
+			<button class="button is-primary is-light" data-ftype="xlsx" id="export-toxlsx-btn">Export to xlsx</button>
+			<button class="button is-primary is-light" data-ftype="csv" id="export-tocsv-btn">Export to csv</button>
+		</div>
+		
 	</div>
 	
 </div>
@@ -50,7 +55,7 @@
 {% set page = page | int %}
 {% set total_page = total_page | int %}
 {{ pagination(page, total_page) }}
-
+{% endblock %}
 
 <script type="text/javascript">
 (function() {
@@ -71,7 +76,7 @@
 	}
 
 	function setLoaderActive() {
-		$(".loader-wrapper").css("display", "block");
+		$("#save-dmp-table > .loader-wrapper").css("display", "block");
   	$("#save-dmp-table > .loader-wrapper > .loader").css({
   		"height" : "30px",
   		"width" : "30px"
@@ -86,18 +91,19 @@
     updateTableContent();
   })
 
-  $("#export-df-btn").click(function() {
+  $("#export-toxlsx-btn, #export-tocsv-btn").click(function() {
   	
   	$(this).css("display", "none");
 
   	$.fileDownload('{{ url_for("main.SaveDMPView") }}', {
-			httpMethod: 'GET',
+			httpMethod: 'POST',
+			data: {fileType : $(this).data("ftype")},
 			prepareCallback:function(url) {
          setLoaderActive()
       },
       successCallback: function() {
-      	$("#export-df-btn").css("display", "block");
-      	$(".loader-wrapper").css("display", "none");
+      	$("#export-toxlsx-btn, #export-tocsv-btn").css("display", "block");
+      	$("#save-dmp-table > .loader-wrapper").css("display", "none");
       },
       failCallback: function() {
       	alert("File download failed!"); 

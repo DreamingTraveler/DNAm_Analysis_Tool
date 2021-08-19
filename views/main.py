@@ -4,10 +4,19 @@ import io
 import urllib
 import config
 import util
+import base64
 import pandas as pd
+import matplotlib.pyplot as plt
+import rpy2.robjects as ro
+import PIL.Image as Image
+from rpy2.robjects.packages import importr
+from rpy2.robjects import r, pandas2ri
+from rpy2.robjects.conversion import localconverter
 from flask import Blueprint, request, abort, render_template, redirect, \
- url_for, current_app, make_response
+ url_for, current_app, make_response, send_file
 from flask.views import MethodView
+# from bioinfokit import analys, visuz
+
 
 
 blueprint = Blueprint('main', __name__)
@@ -26,7 +35,7 @@ class DMP():
 
 class MainView(MethodView):
     def get(self):
-        filter_dmp_df, dmp_class_list = self.get_data_from_csv()
+        _, filter_dmp_df, dmp_class_list = self.get_data_from_csv()
         page, max_dmp_num, dmp_per_page, total_page = self.get_page_info(dmp_class_list)
         dmp_class_sublist = self.get_dmp_list_for_target_page(page, max_dmp_num, dmp_per_page, dmp_class_list)
         
@@ -35,7 +44,7 @@ class MainView(MethodView):
             gene_num=filter_dmp_df["gene"].nunique())
 
     def post(self):
-        filter_dmp_df, dmp_class_list = self.get_data_from_csv()
+        _, filter_dmp_df, dmp_class_list = self.get_data_from_csv()
         page, max_dmp_num, dmp_per_page, total_page = self.get_page_info(dmp_class_list)
         dmp_class_sublist = self.get_dmp_list_for_target_page(page, max_dmp_num, dmp_per_page, dmp_class_list)
         probe_num = len(dmp_class_list)
@@ -146,7 +155,7 @@ class MainView(MethodView):
             dmp_class = DMP(dmp)
             dmp_class_list.append(dmp_class)
 
-        return filter_df, dmp_class_list
+        return sub_df, filter_df, dmp_class_list
 
     def get_page_info(self, dmp_class_list):
         page = request.cookies.get('page') # get the current page number from cookie
@@ -171,25 +180,77 @@ class MainView(MethodView):
         return dmp_class_sublist
 
 class SaveDMPView(MainView):
-    def get(self):
-        filter_df, dmp_class_list = super(SaveDMPView, self).get_data_from_csv()
+    def post(self):
+        file_type = request.form["fileType"]
+        _, filter_df, dmp_class_list = super(SaveDMPView, self).get_data_from_csv()
 
-        out = io.BytesIO()
-        writer = pd.ExcelWriter(out, engine='xlsxwriter')
-        filter_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
-        writer.save()
-        writer.close()
+        if file_type == "xlsx":
+            out = io.BytesIO()
+            writer = pd.ExcelWriter(out, engine='xlsxwriter')
+            filter_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
+            writer.save()
+            writer.close()
+            resp = make_response(out.getvalue())
+            resp.headers["Content-Disposition"] = "attachment; filename=dmp.xlsx"
+            resp.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-        # resp = make_response(filter_df.to_csv(index=False, encoding="utf-8"))
-        resp = make_response(out.getvalue())
-        resp.headers["Content-Disposition"] = "attachment; filename=dmp.xlsx"
-        # resp.headers["Content-Type"] = "text/csv"
-        resp.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        else: 
+            resp = make_response(filter_df.to_csv(index=False, encoding="utf-8"))
+            resp.headers["Content-Disposition"] = "attachment; filename=dmp.csv"
+            resp.headers["Content-Type"] = "text/csv"
+        
         resp.headers["Set-Cookie"] = "fileDownload=true; path=/"
 
         return resp
 
+class PlotView(MainView):
+    def post(self):
+        ori_df, filter_df, dmp_class_list = super(PlotView, self).get_data_from_csv()
+        logFC_threshold = request.cookies.get('logFCThreshold')
+
+        if logFC_threshold == None:
+            logFC_threshold = 0.0
+        else:
+            logFC_threshold = float(logFC_threshold)
+            if logFC_threshold == 0.0:
+                logFC_threshold = 0.5
+
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            r_dataframe = ro.conversion.py2rpy(ori_df)
+
+        # r_dataframe = robjects.conversion.py2rpy(filter_df)
+        r['source']('./voc_plot.R')
+        res_byte_array = r('generateVocPlot')(r_dataframe, logFC_threshold, 0.01)
+
+        res = io.BytesIO(bytes(res_byte_array))
+        res.seek(0)
+        print(type(res))
+
+        plot_url = base64.b64encode(res.getvalue()).decode()
+        content = '<img src="data:image/png;base64,{}">'.format(plot_url)
+        # print(content)
+        # logFC_threshold = request.cookies.get('logFCThreshold')
+        # if logFC_threshold == None:
+        #     logFC_threshold = 0.0
+        # else:
+        #     logFC_threshold = float(logFC_threshold)
+        #     if logFC_threshold == 0.0:
+        #         logFC_threshold = 0.5
+
+        # print(logFC_threshold)
+
+        # visuz.gene_exp.volcano(df=filter_df, lfc="logFC", pv="P.Value", 
+        #     lfc_thr=(logFC_threshold, logFC_threshold), pv_thr=(0.01, 0.01), 
+        #     geneid="gene", sign_line=True)
+
+        # return content
+        return render_template("base/plots.html", img_url=plot_url)
+        # return send_file(res,
+        #              attachment_filename='logo.png',
+        #              mimetype='image/png')
+        
                        
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
+blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))
 blueprint.add_url_rule('/save', view_func=SaveDMPView.as_view(SaveDMPView.__name__))

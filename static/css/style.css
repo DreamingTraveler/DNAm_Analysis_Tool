@@ -90,3 +90,7 @@
     width: 80px;
     margin: auto;
 }
+
+#export-toxlsx-btn, #export-csv-btn{
+    margin-bottom: 5px;
+}

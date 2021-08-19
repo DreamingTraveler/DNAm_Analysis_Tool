@@ -20,15 +20,6 @@
 	    </div>
 		</div>
 
-	  <!-- <div class="panel-block">
-	    <p class="control has-icons-left">
-	      <input class="input" id="search-dmp" type="text" placeholder="Search">
-	      <span class="icon is-left">
-	        <i class="fas fa-search" aria-hidden="true"></i>
-	      </span>
-	    </p>
-	  </div> -->
-
 	  <div class="panel-block" id="search-filter-block">
 		  <div class="field" id="search-filter-options">
 			  <input class="is-checkradio" id="search-filter-radio-probe" type="radio" name="search-filter-radio" value="probe" checked="checked">
@@ -136,17 +127,18 @@
 	  </div>
 	</nav>
 
-	<section class="column">
+	<!-- result display area (right block)-->
+	<section class="column" id="res-display-opetions">
 		<div class="tabs is-boxed">
-		  <ul>
-		    <li class="is-active">
-		      <a>
+		  <ul id="res-options-list">
+		    <li class="is-active" id="dmp-table-opt">
+		      <a id="dmp-table-link">
 		        <span>DMPs table</span>
 		      </a>
 		    </li>
-		    <li>
-		      <a>
-		        <span>???</span>
+		    <li id="plot-display-opt">
+		      <a id="plot-view-link">
+		        <span>Statistical plots</span>
 		      </a>
 		    </li>
 		    <li>
@@ -161,8 +153,21 @@
 		    </li>
 		  </ul>
 		</div>
-		
+
 		<div id="dmp-info-area">
+			
+			{% block plot %} {% endblock %}
+			{% block dmp_table %} {% endblock %}
+		</div>
+		<div hidden id="hidden-loader">
+			<div class="loader-wrapper">
+			    <div class="loader is-loading"></div>
+			    <p id="pls-wait-txt" style="font-size: 14px; text-align: center;">Please Wait...</p>
+			</div>
+		</div>
+		
+		
+		<!-- <div id="dmp-info-area">
 			<table class="table is-striped" id="dmp-display-table">
 		    <thead>
 	        <tr>
@@ -195,7 +200,7 @@
 			{% set page = page | int %}
 			{% set total_page = total_page | int %}
 			{{ pagination(page, total_page) }}
-		</div>
+		</div> -->
 	</section>
 </div>
 
@@ -210,28 +215,29 @@
 		$.removeCookie('stageOption');
 		bulmaTagsinput.attach();
 
-		setMethyStatus(); // initialize the methylation status (use cookie to store)
-		updateTableContent();
-
 		function setMethyStatus() {
 			$.cookie('isHyper', $("#is-hyper").is(":checked"))
 			$.cookie('isHypo', $("#is-hypo").is(":checked"))
 		}
 
 		function updateTableContent() {
-			$.ajax({
-    	  url: '{{ url_for("main.MainView") }}',
-	      type: 'POST',
-        success: function(block)
-        {
-					$("#dmp-info-area").html(block);
+			if ($("#dmp-table-opt").hasClass("is-active")){
+				$.ajax({
+	    	  url: '{{ url_for("main.MainView") }}',
+		      type: 'POST',
+	        success: function(block) {
+	        		$("#dmp-info-area").html(block);
+	        },
+	        error: function(response) {
+	          console.log(response);
+	        } 
+		    });
+			}
 
-        },
-        error: function(response)
-        {
-          console.log(response);
-        } 
-	    });
+			else {
+				setTimeout(updateTableContent, 500);
+			}
+			
 		}
 
 		function showPhenoOpts(pheno) {
@@ -254,9 +260,55 @@
 			updateTableContent();
 		}
 
-		// $("#search-dmp > input").on("input", function() {
-		//    alert($(this).val()); 
-		// });
+		function setLoaderActive() {
+			$("#dmp-info-area > .loader-wrapper").css({
+				"display" : "block",
+	  		"transform" : "translateY(100%)"
+			});
+
+	  	$("#dmp-info-area > .loader-wrapper > .loader").css({
+	  		"height" : "80px",
+	  		"width" : "80px"
+	  	});
+		}
+
+		function updatePlots() {
+			if ($("#plot-display-opt").hasClass("is-active")) {
+				$.ajax({
+	    	  url: '{{ url_for("main.PlotView") }}',
+		      type: 'POST',
+		      beforeSend: function() {
+		      	var loaderHtml = $("#hidden-loader").html();
+		      	$("#dmp-info-area").html(loaderHtml)
+		      	setLoaderActive();
+		      },
+	        success: function(block) {
+	        	$("#dmp-info-area > .loader-wrapper").remove();
+	        	$("#dmp-info-area").html(block);
+	        },
+	        error: function(response) {
+	          console.log(response);
+	        } 
+		    });
+		  }
+
+		  else {
+		  	setTimeout(updatePlots, 500);
+		  }
+		}
+
+		setMethyStatus(); // initialize the methylation status (use cookie to store)
+		updateTableContent();
+
+		// ----- Left panel -----
+		// select cancer type
+		$("#cancer-option > a").click(function() {
+			var cancerType = $(this).data("cancer-type");
+			$.cookie('cancerType', cancerType);
+
+			updatePlots();
+			updateTableContent();
+		})
 
 	
 		// search probe or gene 
@@ -276,6 +328,7 @@
 			updateTableContent();
 		})
 
+		// select search filter (probe ID or gene name)
 		$("#search-filter-options").change(function() {
 			var searchFilterOpt = $('input[name=search-filter-radio]:checked').val();
 
@@ -292,21 +345,29 @@
 		$("#pheno-menu > .dropdown-content > a").click(function() {
 			var pheno = $(this).data("pheno")
 			
-			$("#pheno-text").html($(this).html())
+			$("#pheno-text").html($(this).html());
+
+			updatePlots();
 			showPhenoOpts(pheno);
 		})
 
+		// select race
 		$("#race-options > .field").change(function() {
 			var race = $('input[name=race-radio]:checked').val();
 
 			$.cookie('raceOption', race);
+
+			updatePlots();
 			updateTableContent();
 		})
 
+		// select stage
 		$("#stage-options > .field").change(function() {
 			var stage = $('input[name=stage-radio]:checked').val();
 
 			$.cookie('stageOption', stage);
+
+			updatePlots();
 			updateTableContent();
 		})
 
@@ -318,9 +379,11 @@
 			$.cookie('logFCThreshold', threshold);
 			$("#threshold-val").html("Threshold value: " + threshold)
 
+			updatePlots();
 			updateTableContent();
 		})
 
+		// hyper, hypo switches
 		$("#is-hyper, #is-hypo").change(function() {
 			$.cookie('page', 1);
 			setMethyStatus()
@@ -333,6 +396,23 @@
 			updateTableContent();
 		})
 
+
+		// ----- result display area ------
+		// switch option
+		$("#res-options-list > li").click(function() {
+			$("#res-options-list > li").removeClass("is-active");
+			$(this).addClass("is-active");
+		})
+
+		$("#dmp-table-link").click(function() {
+			updateTableContent();
+		})
+
+		$("#plot-view-link").click(function() {
+			updatePlots();
+		})
+
+
 		$(".pagination-link").click(function(event) {
       event.preventDefault();
       var page = $(this).data("page");
@@ -341,12 +421,10 @@
     	
     })
 
-		$("#cancer-option > a").click(function() {
-			var cancerType = $(this).data("cancer-type");
-			$.cookie('cancerType', cancerType);
 
-			updateTableContent();
-		})
+    
+
+		
 	})();
 </script>
 
