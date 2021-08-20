@@ -183,20 +183,38 @@ class SaveDMPView(MainView):
     def post(self):
         file_type = request.form["fileType"]
         _, filter_df, dmp_class_list = super(SaveDMPView, self).get_data_from_csv()
+        cancer_type = request.cookies.get('cancerType')
+        race = request.cookies.get('raceOption')
+        stage = request.cookies.get('stageOption')
+        logFC_threshold = request.cookies.get('logFCThreshold')
 
+        cancer_type = cancer_type if cancer_type else "colorectal"
+        race = race+"_" if race else ""
+        stage = stage+"_" if stage else ""
+        logFC_threshold = logFC_threshold if logFC_threshold else "0.0"
+
+        print(cancer_type, race, stage, logFC_threshold)
+
+        filename = cancer_type + "_" + race + stage + "biomarkers_threshold_" + \
+                    logFC_threshold
+
+        print(filename)
         if file_type == "xlsx":
             out = io.BytesIO()
             writer = pd.ExcelWriter(out, engine='xlsxwriter')
             filter_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
             writer.save()
             writer.close()
+
+            content_disp = "attachment; filename={filename}.xlsx".format(filename=filename)
             resp = make_response(out.getvalue())
-            resp.headers["Content-Disposition"] = "attachment; filename=dmp.xlsx"
+            resp.headers["Content-Disposition"] = content_disp
             resp.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
         else: 
+            content_disp = "attachment; filename={filename}.csv".format(filename=filename)
             resp = make_response(filter_df.to_csv(index=False, encoding="utf-8"))
-            resp.headers["Content-Disposition"] = "attachment; filename=dmp.csv"
+            resp.headers["Content-Disposition"] = content_disp
             resp.headers["Content-Type"] = "text/csv"
         
         resp.headers["Set-Cookie"] = "fileDownload=true; path=/"
@@ -218,7 +236,6 @@ class PlotView(MainView):
         with localconverter(ro.default_converter + pandas2ri.converter):
             r_dataframe = ro.conversion.py2rpy(ori_df)
 
-        # r_dataframe = robjects.conversion.py2rpy(filter_df)
         r['source']('./voc_plot.R')
         res_byte_array = r('generateVocPlot')(r_dataframe, logFC_threshold, 0.01)
 
@@ -228,27 +245,9 @@ class PlotView(MainView):
 
         plot_url = base64.b64encode(res.getvalue()).decode()
         content = '<img src="data:image/png;base64,{}">'.format(plot_url)
-        # print(content)
-        # logFC_threshold = request.cookies.get('logFCThreshold')
-        # if logFC_threshold == None:
-        #     logFC_threshold = 0.0
-        # else:
-        #     logFC_threshold = float(logFC_threshold)
-        #     if logFC_threshold == 0.0:
-        #         logFC_threshold = 0.5
-
-        # print(logFC_threshold)
-
-        # visuz.gene_exp.volcano(df=filter_df, lfc="logFC", pv="P.Value", 
-        #     lfc_thr=(logFC_threshold, logFC_threshold), pv_thr=(0.01, 0.01), 
-        #     geneid="gene", sign_line=True)
-
-        # return content
+       
         return render_template("base/plots.html", img_url=plot_url)
-        # return send_file(res,
-        #              attachment_filename='logo.png',
-        #              mimetype='image/png')
-        
+
                        
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
