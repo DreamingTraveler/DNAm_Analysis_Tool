@@ -1,6 +1,9 @@
 DEBUG = True
 SECRET_KEY = 'c882369d7b66e8697426c3e8fb2675c0'
 
+UPLOAD_FOLDER = './static/upload/dmp_tables_operation'
+ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
+
 SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "P.Value", "CHR", \
 "MAPINFO", "gene", "feat.cgi", "feature", "cgi"]
 

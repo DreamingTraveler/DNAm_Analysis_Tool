@@ -7,15 +7,21 @@
 	margin-bottom: 50px;
 }
 
-#main-panel > .panel-heading{
+.panel-tabs > a {
+    border-bottom: 2px solid #dbdbdb;
+}
+
+#main-panel > .panel-heading {
 	font-size: 1.5vw;	
 }
 
 .tagsinput {
 	height: auto !important;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
-.tagsinput > input {
+.tagsinput >input {
 	margin-bottom: 0.75em;
 }
 
@@ -93,4 +99,21 @@
 
 #export-toxlsx-btn, #export-csv-btn{
     margin-bottom: 5px;
+}
+
+/* dmp_tables_operation */
+#custom-options {
+    display: none;
+}
+#uploadFileArea {
+    margin: auto;
+    margin-top: 10px;
+    width: 70%;
+}
+#upload-btn {
+    position: relative;
+    left: 45%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
 }

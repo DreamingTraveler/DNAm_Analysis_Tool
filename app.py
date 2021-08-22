@@ -14,6 +14,8 @@ app.debug = True
 
 
 app.register_blueprint(views.main.blueprint, url_prefix='/')
+app.register_blueprint(views.dmp_tables_operation.blueprint, 
+	url_prefix='/dmp_tables_operation')
 
 def create_app(info=None):
 	return app
