@@ -47,7 +47,6 @@
 			<button class="button is-primary is-light" data-ftype="xlsx" id="export-toxlsx-btn">Export to xlsx</button>
 			<button class="button is-primary is-light" data-ftype="csv" id="export-tocsv-btn">Export to csv</button>
 		</div>
-		
 	</div>
 	
 </div>
@@ -92,12 +91,14 @@
   })
 
   $("#export-toxlsx-btn, #export-tocsv-btn").click(function() {
-  	
   	$(this).css("display", "none");
 
   	$.fileDownload('{{ url_for("main.SaveDMPView") }}', {
 			httpMethod: 'POST',
-			data: {fileType : $(this).data("ftype")},
+			data: {
+        fileType : $(this).data("ftype"),
+        df: ""
+      },
 			prepareCallback:function(url) {
          setLoaderActive()
       },

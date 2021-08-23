@@ -46,11 +46,9 @@ class UploadfileView(MethodView):
 		intersect_df = intersect_df.fillna("NA")
 		headers = list(intersect_df.columns)
 		result_list = intersect_df.values.tolist()
-		print(headers)
 
-		intersect_df.to_csv(config.UPLOAD_FOLDER+"/ss.csv", index=False, encoding="utf-8")
-
-		return render_template("dmp_tables_operation/preview_table.html",
+		return render_template("dmp_tables_operation/preview_table.html", 
+			intersect_df=intersect_df,
 			headers=headers, result=result_list)
 
 	def allowed_file(self, filename):

@@ -182,6 +182,8 @@ class MainView(MethodView):
 class SaveDMPView(MainView):
     def post(self):
         file_type = request.form["fileType"]
+        intersect_df = request.form["df"]
+
         _, filter_df, dmp_class_list = super(SaveDMPView, self).get_data_from_csv()
         cancer_type = request.cookies.get('cancerType')
         race = request.cookies.get('raceOption')
@@ -196,12 +198,17 @@ class SaveDMPView(MainView):
         filename = cancer_type + "_" + race + stage + "biomarkers_threshold_" + \
                     logFC_threshold
 
+        result_df = filter_df
+        if intersect_df:
+            string_df = io.StringIO(intersect_df)
+            result_df = pd.read_csv(string_df, sep=r"\s+", engine="python")
+
         if file_type == "xlsx":
             out = io.BytesIO()
             writer = pd.ExcelWriter(out, engine='xlsxwriter')
-            filter_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
+            result_df.to_excel(excel_writer=writer, index=False, encoding="utf-8")
             writer.save()
-            writer.close()
+            # writer.close()
 
             content_disp = "attachment; filename={filename}.xlsx".format(filename=filename)
             resp = make_response(out.getvalue())
@@ -210,7 +217,7 @@ class SaveDMPView(MainView):
 
         else: 
             content_disp = "attachment; filename={filename}.csv".format(filename=filename)
-            resp = make_response(filter_df.to_csv(index=False, encoding="utf-8"))
+            resp = make_response(result_df.to_csv(index=False, encoding="utf-8"))
             resp.headers["Content-Disposition"] = content_disp
             resp.headers["Content-Type"] = "text/csv"
         
@@ -242,9 +249,7 @@ class PlotView(MainView):
         plot_url = base64.b64encode(res.getvalue()).decode()
         content = '<img src="data:image/png;base64,{}">'.format(plot_url)
        
-        return render_template("base/plots.html", img_url=plot_url)
-
-                       
+        return render_template("base/plots.html", img_url=plot_url)                       
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))

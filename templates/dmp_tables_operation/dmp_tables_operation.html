@@ -67,6 +67,19 @@
 	<div id="preview-area">
 		{% block preview_table %} {% endblock %}
 	</div>  
+
+	<div id="save-dmp-table" style="display: none; margin-right: 7%;">
+		<div class="loader-wrapper">
+		    <div class="loader is-loading"></div>
+		    <p id="pls-wait-txt" style="font-size: 14px; text-align: center;">Please Wait...</p>
+		</div>
+		<div id="save-file-btns" style="display: flex; flex-direction: column; justify-content: center;">
+			<button class="button is-primary is-light" data-ftype="xlsx" 
+			id="export-toxlsx-btn" style="width: 130px; margin: auto;">Export to xlsx</button>
+			<button class="button is-primary is-light" data-ftype="csv" 
+			id="export-tocsv-btn" style="width: 130px; margin: 10px auto;">Export to csv</button>
+		</div>
+	</div>
 <!-- 
   {% with messages = get_flashed_messages() %}
 	 
@@ -76,82 +89,109 @@
 	    {% endfor %}
 	    </ul>
 	{% endwith %} -->
-
-  
 </article>
 
-
 <script type="text/javascript">
-	(function () {
-		Dropzone.autoDiscover = false;
-		var myDropzone = new Dropzone("#uploadFileArea", {
-			acceptedFiles: ".xlsx, .csv",
-			autoProcessQueue: false,
-			addRemoveLinks: true,
-			dictMaxFilesExceeded: "You can only upload at most 3 files", 
-			dictDefaultMessage: "Click to upload a file / drag and drop a file",
-		  paramName: "file", // The name that will be used to transfer the file
-		  parallelUploads: 10, // How many file uploads to process in parallel
-		  maxFiles: 3,
-		  maxFilesize: 7000, // MB
-		  timeout: 1000000,
-		  uploadMultiple: true,
-		  init: function() {
-		  	dropzone = this
-		  	$("#upload-btn").click(function() {
-		  		dropzone.processQueue();
-		  	});	
+(function () {
+	Dropzone.autoDiscover = false;
+	var myDropzone = new Dropzone("#uploadFileArea", {
+		acceptedFiles: ".xlsx, .csv",
+		autoProcessQueue: false,
+		addRemoveLinks: true,
+		dictMaxFilesExceeded: "You can only upload at most 3 files", 
+		dictDefaultMessage: "Click to upload a file / drag and drop a file",
+	  paramName: "file", // The name that will be used to transfer the file
+	  parallelUploads: 10, // How many file uploads to process in parallel
+	  maxFiles: 3,
+	  maxFilesize: 7000, // MB
+	  timeout: 1000000,
+	  uploadMultiple: true,
+	  init: function() {
+	  	dropzone = this
+	  	$("#upload-btn").click(function() {
+	  		dropzone.processQueue();
+	  	});	
 
-		  },
-			success: function(file, response) {
-				$("#preview-area").css("display", "block");
-				$("#preview-area").html(response);
-				setTimeout(function() {
-					myDropzone.removeAllFiles()
-				}, 3000)
-			}
-		});
-
-		clearCookies();
-		initCookies();
-
-		function clearCookies() {
-			var cookies = $.cookie();
-			for(var cookie in cookies) {
-			   $.removeCookie(cookie);
-			}
+	  },
+		success: function(file, response) {
+			$("#preview-area").css("display", "block");
+			$("#preview-area").html(response);
+			$("#save-dmp-table").css("display", "block");
+			setTimeout(function() {
+				myDropzone.removeAllFiles()
+			}, 3000)
 		}
+	});
 
-		function initCookies() {
-			$.cookie('operatedTarget', $("#operate-target-radio-probe").val())
-			$.cookie('operation', $("#operation-radio-inter").val())
+	clearCookies();
+	initCookies();
+
+	function clearCookies() {
+		var cookies = $.cookie();
+		for(var cookie in cookies) {
+		   $.removeCookie(cookie);
 		}
+	}
 
-		// operate on probe ID / gene name
-		$("#operate-target-options").on("change", function() {
-			var opTarget = $('input[name=operate-target-radio]:checked').val();
+	function initCookies() {
+		$.cookie('operatedTarget', $("#operate-target-radio-probe").val())
+		$.cookie('operation', $("#operation-radio-inter").val())
+	}
 
-			$.cookie('operatedTarget', opTarget);
-		})
+	function setLoaderActive() {
+		$("#save-dmp-table > .loader-wrapper").css("display", "block");
+  	$("#save-dmp-table > .loader-wrapper > .loader").css({
+  		"height" : "30px",
+  		"width" : "30px"
+  	})
+	}
 
-		// select the operation
-		$("#operation-options").on("change", function() {
-			var operation = $('input[name=operation-radio]:checked').val();
+	$("#default-opt").click(function() {
+		$("#default-options").css("display", "block");
+		$("#custom-options").css("display", "none");
+	});
 
-			$.cookie('operation', operation);
-		})
+	$("#custom-opt").click(function() {
+		$("#custom-options").css("display", "block");
+		$("#default-options").css("display", "none");
+	});
 
+	// operate on probe ID / gene name
+	$("#operate-target-options").on("change", function() {
+		var opTarget = $('input[name=operate-target-radio]:checked').val();
 
-		$("#default-opt").click(function() {
-			$("#default-options").css("display", "block");
-			$("#custom-options").css("display", "none");
+		$.cookie('operatedTarget', opTarget);
+	});
+
+	// select the operation
+	$("#operation-options").on("change", function() {
+		var operation = $('input[name=operation-radio]:checked').val();
+
+		$.cookie('operation', operation);
+	});
+	
+	$("#export-toxlsx-btn, #export-tocsv-btn").click(function() {
+  	$(this).css("display", "none");
+
+  	$.fileDownload('{{ url_for("main.SaveDMPView") }}', {
+			httpMethod: 'POST',
+			data: {
+				fileType : $(this).data("ftype"),
+				df: $("#df").html()
+			},
+			prepareCallback:function(url) {
+         setLoaderActive()
+      },
+      successCallback: function() {
+      	$("#export-toxlsx-btn, #export-tocsv-btn").css("display", "block");
+      	$("#save-dmp-table > .loader-wrapper").css("display", "none");
+      },
+      failCallback: function() {
+      	alert("File download failed!"); 
+      }
 		});
+  });
 
-		$("#custom-opt").click(function() {
-			$("#custom-options").css("display", "block");
-			$("#default-options").css("display", "none");
-		});
-
-	})();
+})();
 </script>
 {% endblock %}
