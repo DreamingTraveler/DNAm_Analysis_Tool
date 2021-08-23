@@ -1,4 +1,5 @@
 import os
+import io
 import pandas as pd
 import config
 import util
@@ -16,27 +17,62 @@ class DMPTablesOPView(MethodView):
 		return render_template("dmp_tables_operation/dmp_tables_operation.html")
 
 class UploadfileView(MethodView):
+	def get(self):
+		return render_template("dmp_tables_operation/dmp_tables_operation.html")
 	def post(self):
-		uploaded_file = request.files["file"]
+		uploaded_files = request.files
+		df_list = []
 		# if uploaded_file.filename == '':
 		# 	flash('No selected file')
 		# 	return redirect(request.url)
 
-		if not self.allowed_file(uploaded_file.filename):
-			flash('File type error (.xlsx and .csv only)')
-			print("SS")
-			return render_template("dmp_tables_operation/dmp_tables_operation.html")
+		for f in uploaded_files:
+			file = uploaded_files.get(f)
+			if not self.allowed_file(file.filename):
+				flash('File type error (.xlsx and .csv only)')
+				return render_template("dmp_tables_operation/dmp_tables_operation.html")
 
-		if uploaded_file and self.allowed_file(uploaded_file.filename):
-			safe_filename = secure_filename(uploaded_file.filename)
-			uploaded_file.save(os.path.join(config.UPLOAD_FOLDER, safe_filename))
+			if file and self.allowed_file(file.filename):
+				safe_filename = secure_filename(file.filename)
+				# file.save(os.path.join(config.UPLOAD_FOLDER, safe_filename))
+				file_type = file.filename.split(".")[-1]
+				if file_type == "csv":
+					df = pd.read_csv(file)
+				else:
+					df = pd.read_excel(file)
+				df_list.append(df)
+		
+		intersect_df = self.operate_files(df_list)
+		intersect_df = intersect_df.fillna("NA")
+		headers = list(intersect_df.columns)
+		result_list = intersect_df.values.tolist()
+		print(headers)
 
-		# print(uploaded_file.filename)
-		return redirect(url_for('dmp_tables_operation.DMPTablesOPView'))
+		intersect_df.to_csv(config.UPLOAD_FOLDER+"/ss.csv", index=False, encoding="utf-8")
+
+		return render_template("dmp_tables_operation/preview_table.html",
+			headers=headers, result=result_list)
+
 	def allowed_file(self, filename):
 		return '.' in filename and \
 			filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 
+	def operate_files(self, df_list):
+		op_target = request.cookies.get("operatedTarget")
+		operation = request.cookies.get("operation")
+
+		if request.cookies.get("operatedTarget") == "probe":
+			op_target = "Probe_ID"
+		else:
+			op_target = "gene"
+
+		info_df = df_list[0][op_target]
+		intersect_df = info_df
+
+		for df in df_list[1:]:
+			intersect_df = pd.merge(intersect_df, df, how="inner", on=[op_target])
+		
+		return intersect_df		
 
 blueprint.add_url_rule('/', 
 	view_func=DMPTablesOPView.as_view(DMPTablesOPView.__name__))

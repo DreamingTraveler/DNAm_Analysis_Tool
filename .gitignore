@@ -142,4 +142,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# custom
 package-lock.json
+static/upload

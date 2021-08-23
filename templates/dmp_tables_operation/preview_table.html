@@ -1,0 +1,24 @@
+{% block preview_table %}
+<h3 style="font-size: 30px; text-align: center; margin-bottom: 30px;">
+	<b>Preview</b>
+</h3>
+<table class="table is-striped" id="preview-table">
+	<thead>
+		<tr>
+			{% for h_name in headers %}
+		  <th>{{ h_name }}</th>
+		  {% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for dmp in result %}
+		<tr>
+		  <th>{{ dmp[0] }}</th>
+		  {% for val in dmp[1:] %}
+		  <td>{{ val }}</td>
+		  {% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %} 

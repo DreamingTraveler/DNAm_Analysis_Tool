@@ -9,8 +9,30 @@
     <a id="custom-opt">Use custom DMP files</a>
   </p>
 
+  <div class="panel-block" id="operate-target-block">
+  	<h2 style="margin-right: 10px;"><b>Operate on:</b></h2>
+	  <div class="field" id="operate-target-options">
+		  <input class="is-checkradio" id="operate-target-radio-probe" type="radio" name="operate-target-radio" value="probe" checked="checked">
+		  <label for="operate-target-radio-probe">Probe ID</label>
+
+		  <input class="is-checkradio" id="operate-target-radio-gene" type="radio" name="operate-target-radio" value="gene">
+		  <label for="operate-target-radio-gene">Gene name</label>
+		</div>
+	</div>
+
+	<div class="panel-block" id="operation-block">
+  	<h2 style="margin-right: 10px;"><b>Operations: </b></h2>
+	  <div class="field" id="operation-options">
+		  <input class="is-checkradio" id="operation-radio-inter" type="radio" name="operation-radio" value="intersection" checked="checked">
+		  <label for="operation-radio-inter">Intersection</label>
+
+		  <input class="is-checkradio" id="operation-radio-sym" type="radio" name="operation-radio" value="symmetricDiff">
+		  <label for="operation-radio-sym">Symmetric Difference</label>
+		</div>
+	</div>
+
   <div id="default-options">
-  	<a class="panel-block is-active">
+  	<!-- <a class="panel-block is-active">
 	    <span class="panel-icon">
 	      <i class="fas fa-book" aria-hidden="true"></i>
 	    </span>
@@ -33,23 +55,18 @@
 	      <i class="fas fa-book" aria-hidden="true"></i>
 	    </span>
 	    jgthms.github.io
-	  </a>
+	  </a> -->
   </div>
 
   <div id="custom-options">
-  	<!-- <form action="{{ url_for('dmp_tables_operation.UploadfileView') }}" method="post" enctype="multipart/form-data" class="dropzone">
-		  <div class="fallback">
-		    <input name="uploadedFile" type="file" multiple />
-		  </div>
-		</form> -->
 		<form action="{{ url_for('dmp_tables_operation.UploadfileView') }}" enctype="multipart/form-data" id="uploadFileArea" class="dropzone">
-			<!-- <input name="uploadedFile" type="file" multiple /> -->
-			<!-- <h3 style="text-align: center;">Click to upload a file or drag and drop a file</h3> -->
-			<!-- <div class="dz-default dz-message">
-			</div> -->
 		</form>
-		<button class="button is-primary is-light" id="upload-btn">Upload</button>
   </div>
+  <button class="button is-primary is-light" id="upload-btn">Upload</button>
+
+	<div id="preview-area">
+		{% block preview_table %} {% endblock %}
+	</div>  
 <!-- 
   {% with messages = get_flashed_messages() %}
 	 
@@ -62,24 +79,68 @@
 
   
 </article>
+
+
 <script type="text/javascript">
 	(function () {
-		Dropzone.options.uploadFileArea = {
+		Dropzone.autoDiscover = false;
+		var myDropzone = new Dropzone("#uploadFileArea", {
 			acceptedFiles: ".xlsx, .csv",
 			autoProcessQueue: false,
 			addRemoveLinks: true,
+			dictMaxFilesExceeded: "You can only upload at most 3 files", 
 			dictDefaultMessage: "Click to upload a file / drag and drop a file",
 		  paramName: "file", // The name that will be used to transfer the file
 		  parallelUploads: 10, // How many file uploads to process in parallel
+		  maxFiles: 3,
 		  maxFilesize: 7000, // MB
 		  timeout: 1000000,
+		  uploadMultiple: true,
 		  init: function() {
 		  	dropzone = this
 		  	$("#upload-btn").click(function() {
 		  		dropzone.processQueue();
 		  	});	
-		  }
-		};
+
+		  },
+			success: function(file, response) {
+				$("#preview-area").css("display", "block");
+				$("#preview-area").html(response);
+				setTimeout(function() {
+					myDropzone.removeAllFiles()
+				}, 3000)
+			}
+		});
+
+		clearCookies();
+		initCookies();
+
+		function clearCookies() {
+			var cookies = $.cookie();
+			for(var cookie in cookies) {
+			   $.removeCookie(cookie);
+			}
+		}
+
+		function initCookies() {
+			$.cookie('operatedTarget', $("#operate-target-radio-probe").val())
+			$.cookie('operation', $("#operation-radio-inter").val())
+		}
+
+		// operate on probe ID / gene name
+		$("#operate-target-options").on("change", function() {
+			var opTarget = $('input[name=operate-target-radio]:checked').val();
+
+			$.cookie('operatedTarget', opTarget);
+		})
+
+		// select the operation
+		$("#operation-options").on("change", function() {
+			var operation = $('input[name=operation-radio]:checked').val();
+
+			$.cookie('operation', operation);
+		})
+
 
 		$("#default-opt").click(function() {
 			$("#default-options").css("display", "block");
