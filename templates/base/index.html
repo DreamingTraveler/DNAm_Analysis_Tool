@@ -206,15 +206,24 @@
 
 <script type="text/javascript">
 	(function () {
-		$.removeCookie('searchFilterText');
-		$.removeCookie('searchFilterOption');
-		$.removeCookie('logFCThreshold');
-		$.removeCookie('cancerType');
-		$.removeCookie('isDuplicateGenes');
-		$.removeCookie('raceOption');
-		$.removeCookie('stageOption');
+		
+		// $.removeCookie('searchFilterText');
+		// $.removeCookie('searchFilterOption');
+		// $.removeCookie('logFCThreshold');
+		// $.removeCookie('cancerType');
+		// $.removeCookie('isDuplicateGenes');
+		// $.removeCookie('raceOption');
+		// $.removeCookie('stageOption');
 		bulmaTagsinput.attach();
+		clearCookies();
 
+		function clearCookies() {
+			var cookies = $.cookie();
+			for(var cookie in cookies) {
+			   $.removeCookie(cookie);
+			}
+		}
+		
 		function setMethyStatus() {
 			$.cookie('isHyper', $("#is-hyper").is(":checked"))
 			$.cookie('isHypo', $("#is-hypo").is(":checked"))
