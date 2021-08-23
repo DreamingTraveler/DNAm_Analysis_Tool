@@ -33,8 +33,8 @@
 	margin-right: 10px;
 }
 
-#search-filter-block {
-	border-bottom: 5px solid #ededed !important;
+.panel-block {
+	border-bottom: 3px solid #ededed !important;
 }
 
 #pheno-dropdown {
