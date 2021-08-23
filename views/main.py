@@ -193,12 +193,9 @@ class SaveDMPView(MainView):
         stage = stage+"_" if stage else ""
         logFC_threshold = logFC_threshold if logFC_threshold else "0.0"
 
-        print(cancer_type, race, stage, logFC_threshold)
-
         filename = cancer_type + "_" + race + stage + "biomarkers_threshold_" + \
                     logFC_threshold
 
-        print(filename)
         if file_type == "xlsx":
             out = io.BytesIO()
             writer = pd.ExcelWriter(out, engine='xlsxwriter')
@@ -241,7 +238,6 @@ class PlotView(MainView):
 
         res = io.BytesIO(bytes(res_byte_array))
         res.seek(0)
-        print(type(res))
 
         plot_url = base64.b64encode(res.getvalue()).decode()
         content = '<img src="data:image/png;base64,{}">'.format(plot_url)
