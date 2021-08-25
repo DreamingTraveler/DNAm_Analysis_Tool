@@ -21,6 +21,7 @@
 		{% endfor %}
 	</tbody>
 </table>
+<p style="text-align: center;">Number of rows: {{ row_num }}</p>
 
-<div id="df" hidden>{{ intersect_df |safe  }}</div>
+<div id="df" hidden>{{ target_df |safe  }}</div>
 {% endblock %}

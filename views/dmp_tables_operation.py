@@ -3,6 +3,7 @@ import io
 import pandas as pd
 import config
 import util
+import json
 from flask import Blueprint, request, abort, render_template, redirect, \
  url_for, current_app, make_response, send_file, flash
 from flask.views import MethodView
@@ -10,7 +11,9 @@ from werkzeug.utils import secure_filename
 
 blueprint = Blueprint('dmp_tables_operation', __name__)
 dmp_tables = util.DMPTables()
-
+pd.options.display.max_columns = 16384
+pd.options.display.max_rows = 1048576
+pd.set_option('display.expand_frame_repr', False)
 
 class DMPTablesOPView(MethodView):
 	def get(self):
@@ -42,14 +45,15 @@ class UploadfileView(MethodView):
 					df = pd.read_excel(file)
 				df_list.append(df)
 		
-		intersect_df = self.operate_files(df_list)
-		intersect_df = intersect_df.fillna("NA")
-		headers = list(intersect_df.columns)
-		result_list = intersect_df.values.tolist()
+		target_df = self.operate_files(df_list)
+		target_df = target_df.fillna("NA")
+		headers = list(target_df.columns)
+		result_list = target_df.values.tolist()
+		row_num = len(result_list)
 
 		return render_template("dmp_tables_operation/preview_table.html", 
-			intersect_df=intersect_df,
-			headers=headers, result=result_list)
+			target_df=target_df,
+			headers=headers, result=result_list, row_num=row_num)
 
 	def allowed_file(self, filename):
 		return '.' in filename and \
@@ -64,13 +68,21 @@ class UploadfileView(MethodView):
 		else:
 			op_target = "gene"
 
-		info_df = df_list[0][op_target]
-		intersect_df = info_df
+		
+		target_df = df_list[0][op_target] if operation == "intersection" \
+								else df_list[0]
+		concat_df = None
 
 		for df in df_list[1:]:
-			intersect_df = pd.merge(intersect_df, df, how="inner", on=[op_target])
+			if operation == "intersection":
+				target_df = pd.merge(target_df, df, how="inner", on=[op_target])
+			else: # symmetric diff
+				target_df = pd.concat([target_df, df])
 		
-		return intersect_df		
+		if operation == "symmetricDiff":
+			target_df = target_df.drop_duplicates(subset=op_target, keep=False)
+			
+		return target_df		
 
 blueprint.add_url_rule('/', 
 	view_func=DMPTablesOPView.as_view(DMPTablesOPView.__name__))

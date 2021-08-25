@@ -1,3 +1,25 @@
+#custom-options {
+    display: none;
+}
+
+#uploadFileArea {
+    margin: auto;
+    margin-top: 10px;
+    width: 70%;
+}
+
+#upload-btn {
+    position: relative;
+    left: 45%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+#upload-btn span {
+	margin-right: 0px;
+}
+
 #preview-area {
 	display: none;
 	width: 90%;

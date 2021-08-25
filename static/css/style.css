@@ -100,20 +100,3 @@
 #export-toxlsx-btn, #export-csv-btn{
     margin-bottom: 5px;
 }
-
-/* dmp_tables_operation */
-#custom-options {
-    display: none;
-}
-#uploadFileArea {
-    margin: auto;
-    margin-top: 10px;
-    width: 70%;
-}
-#upload-btn {
-    position: relative;
-    left: 45%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}

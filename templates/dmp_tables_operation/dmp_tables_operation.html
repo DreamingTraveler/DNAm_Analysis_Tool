@@ -21,7 +21,7 @@
 	</div>
 
 	<div class="panel-block" id="operation-block">
-  	<h2 style="margin-right: 10px;"><b>Operations: </b></h2>
+  	<h2 style="margin-right: 10px;"><b>Operators: </b></h2>
 	  <div class="field" id="operation-options">
 		  <input class="is-checkradio" id="operation-radio-inter" type="radio" name="operation-radio" value="intersection" checked="checked">
 		  <label for="operation-radio-inter">Intersection</label>
@@ -62,8 +62,14 @@
 		<form action="{{ url_for('dmp_tables_operation.UploadfileView') }}" enctype="multipart/form-data" id="uploadFileArea" class="dropzone">
 		</form>
   </div>
-  <button class="button is-primary is-light" id="upload-btn">Upload</button>
 
+  <button class="button is-primary is-light" id="upload-btn">
+  	<span class="icon">
+	  	<i class="fas fa-file-upload"></i>
+	  </span>
+	  Upload
+	</button>
+  
 	<div id="preview-area">
 		{% block preview_table %} {% endblock %}
 	</div>  
