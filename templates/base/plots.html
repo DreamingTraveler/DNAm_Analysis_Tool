@@ -1,16 +1,208 @@
 {% block plot %} 
+<div class="dropdown" id="plot-type-dropdown">
+  <div class="dropdown-trigger">
+    <button class="button" id="select-plot-type-btn" aria-haspopup="true" aria-controls="plot-type-dropdown-menu">
+      <span id="plot-type">Choose Plot Type</span>
+      <span class="icon is-small">
+        <i class="fas fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" id="plot-type-dropdown-menu" role="menu">
+    <div class="dropdown-content">
+      <a href="#" data-plot-type="volcano" class="dropdown-item">
+        Volcano plot
+      </a>
+      <a href="#" data-plot-type="subjectNum" class="dropdown-item">
+        Subject number plot 
+      </a>
+    </div>
+  </div>
+</div>
+
 <div id="plot-display-area">
 	<div id="volcano-plot">
+		{% if img_url %}
 		<img src="data:image/png;base64,{{ img_url }}">
+		{% endif %}
 		<!-- {{ content }} -->
 	</div>
+	<div id="subject-num-plot">
+		<div class="panel-block" id="plot-pheno-options">
+	  	<div class="field">
+	  		<!-- <label><b>Race:</b></label> -->
+			  <input class="is-checkradio" id="plot-radio-race" type="radio" name="plot-radio" value="race" checked="checked">
+			  <label for="plot-radio-race">Race</label>
+
+			  <input class="is-checkradio" id="plot-radio-stage" type="radio" name="plot-radio" value="stage">
+			  <label for="plot-radio-stage">Stage</label>
+			</div>
+	  </div>
+
+	  <div id="chart-container"></div>
+	</div>
 </div>
+<!-- <div hidden id="hidden-loader"> -->
+<div class="loader-wrapper">
+  <div class="loader is-loading"></div>
+  <p id="pls-wait-txt" style="font-size: 14px; text-align: center;">Please Wait...</p>
+</div>
+<!-- </div> -->
 {% endblock %}
 
 <script type="text/javascript">
 (function() {
-	// var img = $("{{ content }}");
-	// img.appendTo("#volcano-plot");
+	var colorectalSubInfo = {
+		asian: 12,
+		white: 219,
+		black: 62,
+		earlyStage: 150,
+		lateStage: 125
+	};
+
+	var bladderSubInfo = {
+		asian: 44,
+		white: 335,
+		black: 23,
+		earlyStage: 132,
+		lateStage: 276
+	};
+
+	Highcharts.chart("chart-container", {
+		chart: {
+      type: 'item',
+      height: '80%'
+    },
+		title: {
+			text: "Subject Number Plot"
+		},
+		subtitle: {
+			text: "Colorectal cancer"
+		},
+		legend: {
+      labelFormat: '{name} <span style="opacity: 0.4;>{y}</span>',
+	    layout: 'vertical',
+	    align: 'right',
+	    verticalAlign: 'middle',
+	    itemMarginTop: 10,
+	    itemMarginBottom: 10
+    },
+		series: [{
+			name: "Number of tumor subject: ",
+			keys: ["name", "y", "color", "label"],
+			data: [
+				["Asian", colorectalSubInfo.asian, "#a6a04c", "Asian 亞洲人"],
+				["White", colorectalSubInfo.white, "#f5f2c9", "White 白人"],
+				["Black", colorectalSubInfo.black, "#593112", "Black 黑人/非裔美國人"]
+			],
+			dataLabels: {
+        enabled: true,
+        format: '{point.label}'
+      },
+      center: ["50%", "50%"],
+      size: "70%",
+      startAngle: -100,
+      endAngle: 100
+		}]
+	});
+
+	function setLoaderActive() {
+		$("#dmp-info-area > .loader-wrapper").css({
+			"display" : "block",
+  		"transform" : "translateY(100%)"
+		});
+
+  	$("#dmp-info-area > .loader-wrapper > .loader").css({
+  		"height" : "80px",
+  		"width" : "80px"
+  	});
+	}
+
+	function updatePlots() {
+		if ($("#plot-display-opt").hasClass("is-active")) {
+			$.ajax({
+    	  url: '{{ url_for("main.PlotView") }}',
+	      type: 'POST',
+	      beforeSend: function() {
+	      	var loaderHtml = $("#hidden-loader").html();
+	      	// $("#plot-display-area").css("display", "none");
+	      	$("#dmp-info-area").html(loaderHtml);
+	      	setLoaderActive();
+	      },
+        success: function(block) {
+        	// $("#plot-display-area").css("display", "block");
+        	$("#dmp-info-area > .loader-wrapper").remove();
+        	$("#dmp-info-area").html(block);
+        },
+        error: function(response) {
+          console.log(response);
+        } 
+	    });
+	  }
+
+	  else {
+	  	setTimeout(updatePlots, 500);
+	  }
+	}
+
+	function updateChart() {
+		var cancerType = $.cookie('cancerType');
+		var pheno = $('input[name=plot-radio]:checked').val();
+		var chart = $("#chart-container").highcharts();
+		var subInfo = colorectalSubInfo;
+
+		chart.setTitle(null, { text: "Colorectal cancer"});
+
+		if (cancerType == "bladder") {
+			subInfo = bladderSubInfo;
+			chart.setTitle(null, { text: "Bladder cancer"});
+		}
+
+		var newData = [
+			["Asian", subInfo.asian, "#a6a04c", "Asian 亞洲人"],
+			["White", subInfo.white, "#f5f2c9", "White 白人"],
+			["Black", subInfo.black, "#593112", "Black 黑人/非裔美國人"]
+		]
+
+		if (pheno == "stage") {
+			newData = [
+				["Early Stage (I&II)", subInfo.earlyStage, "#d6963c", "Early Stage (I&II)"],
+				["Late Stage (III&IV)", subInfo.lateStage, "#a10303", "Late Stage (III&IV)"]
+			]
+		}
+
+		chart.series[0].setData(newData);
+	}
+
+	$("#cancer-option a").click(function() {
+		updateChart();
+	})
+
+	$("#plot-pheno-options").change(function() {
+		updateChart();
+	})
+
+	$("#select-plot-type-btn, \
+	 #plot-type-dropdown-menu a").click(function() {
+  	$("#plot-type-dropdown").toggleClass("is-active")
+  });
+
+	$("#plot-type-dropdown-menu a").click(function() {
+		var option = $(this).html();
+		var type = $(this).data("plot-type");
+
+		$("#select-plot-type-btn #plot-type").html(option)
+
+		$.cookie('plotOption', type);
+		if (type == "volcano") {
+			updatePlots();
+		}
+
+		else if (type == "subjectNum") {
+			$("#subject-num-plot").css("display", "block");
+			$("#volcano-plot").css("display", "none");
+		}
+	});
 
 })();
 </script>

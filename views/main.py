@@ -228,6 +228,10 @@ class SaveDMPView(MainView):
 
 class PlotView(MainView):
     def post(self):
+        plot_opt = request.cookies.get('plotOption')
+        if not plot_opt or plot_opt != "volcano":
+            return render_template("base/plots.html")  
+
         ori_df, filter_df, dmp_class_list = super(PlotView, self).get_data_from_csv()
         logFC_threshold = request.cookies.get('logFCThreshold')
 

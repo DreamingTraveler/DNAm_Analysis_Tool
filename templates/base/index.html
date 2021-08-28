@@ -155,7 +155,6 @@
 		</div>
 
 		<div id="dmp-info-area">
-			
 			{% block plot %} {% endblock %}
 			{% block dmp_table %} {% endblock %}
 		</div>
@@ -215,13 +214,16 @@
 		// $.removeCookie('raceOption');
 		// $.removeCookie('stageOption');
 		bulmaTagsinput.attach();
-		clearCookies();
 
 		function clearCookies() {
 			var cookies = $.cookie();
 			for(var cookie in cookies) {
 			   $.removeCookie(cookie);
 			}
+		}
+
+		function initCookies() {
+			$.cookie('cancerType', 'colorectal');
 		}
 
 		function setMethyStatus() {
@@ -246,7 +248,6 @@
 			else {
 				setTimeout(updateTableContent, 500);
 			}
-			
 		}
 
 		function showPhenoOpts(pheno) {
@@ -282,7 +283,9 @@
 		}
 
 		function updatePlots() {
-			if ($("#plot-display-opt").hasClass("is-active")) {
+			var plotType = $.cookie('plotOption');
+
+			if ($("#plot-display-opt").hasClass("is-active") && plotType == "volcano") {
 				$.ajax({
 	    	  url: '{{ url_for("main.PlotView") }}',
 		      type: 'POST',
@@ -306,6 +309,8 @@
 		  }
 		}
 
+		clearCookies();
+		initCookies();
 		setMethyStatus(); // initialize the methylation status (use cookie to store)
 		updateTableContent();
 
@@ -418,7 +423,17 @@
 		})
 
 		$("#plot-view-link").click(function() {
-			updatePlots();
+			$.ajax({
+    	  url: '{{ url_for("main.PlotView") }}',
+	      type: 'POST',
+        success: function(block) {
+        	$("#dmp-info-area").html(block);
+        },
+        error: function(response) {
+          console.log(response);
+        } 
+	    });
+			// updatePlots();
 		})
 
 
