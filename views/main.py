@@ -202,7 +202,8 @@ class SaveDMPView(MainView):
         if intersect_df:
             string_df = io.StringIO(intersect_df)
             result_df = pd.read_csv(string_df,
-                sep=r"\s\s+", escapechar='\\', engine="python")
+                sep=r"\s+", escapechar='\\', engine='python')
+            print(result_df)
 
         if file_type == "xlsx":
             out = io.BytesIO()
