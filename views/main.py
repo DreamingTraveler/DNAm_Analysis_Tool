@@ -128,6 +128,7 @@ class MainView(MethodView):
         if rem_duplicate_genes == "true":
             df = df.sort_values(by="logFC", ascending=False, key=abs)
             df = df.drop_duplicates(subset=["gene"])
+            df = df[df.gene != ""]
 
         if not filter_text:
             return df
