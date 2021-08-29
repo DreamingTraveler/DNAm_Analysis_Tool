@@ -25,8 +25,8 @@ dmp_tables = util.DMPTables()
 class DMP():
     def __init__(self, dmp):
         self.probe_id = dmp[0]
-        self.logFC = dmp[1]
-        self.t_val = dmp[2]
+        self.logFC = '{:.5}'.format(dmp[1])
+        self.t_val = '{:.5}'.format(dmp[2])
         self.p_val = '{:.2e}'.format(dmp[3])
         self.chr = dmp[4]
         self.coord = dmp[5]
@@ -243,7 +243,7 @@ class PlotView(MainView):
             logFC_threshold = float(logFC_threshold)
             if logFC_threshold == 0.0:
                 logFC_threshold = 0.5
-
+        
         with localconverter(ro.default_converter + pandas2ri.converter):
             r_dataframe = ro.conversion.py2rpy(ori_df)
 
