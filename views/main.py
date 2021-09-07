@@ -6,14 +6,13 @@ import config
 import util
 import base64
 import pandas as pd
-import matplotlib.pyplot as plt
-import rpy2.robjects as ro
+import numpy as np
 import PIL.Image as Image
-from rpy2.robjects.packages import importr
-from rpy2.robjects import r, pandas2ri
-from rpy2.robjects.conversion import localconverter
+# import rpy2.robjects as ro
+# from rpy2.robjects import r, pandas2ri
+# from rpy2.robjects.conversion import localconverter
 from flask import Blueprint, request, abort, render_template, redirect, \
- url_for, current_app, make_response, send_file
+ url_for, current_app, make_response, send_file, jsonify, json
 from flask.views import MethodView
 # from bioinfokit import analys, visuz
 
@@ -229,12 +228,11 @@ class SaveDMPView(MainView):
         return resp
 
 class PlotView(MainView):
+    def get(self):
+        return render_template("base/plots.html") 
+
     def post(self):
         plot_opt = request.cookies.get('plotOption')
-        if not plot_opt or plot_opt != "volcano":
-            return render_template("base/plots.html")  
-
-        ori_df, filter_df, dmp_class_list = super(PlotView, self).get_data_from_csv()
         logFC_threshold = request.cookies.get('logFCThreshold')
 
         if logFC_threshold == None:
@@ -242,7 +240,19 @@ class PlotView(MainView):
         else:
             logFC_threshold = float(logFC_threshold)
             if logFC_threshold == 0.0:
-                logFC_threshold = 0.5
+                logFC_threshold = 0.5  
+
+        if plot_opt == "enrichedGenePlot":
+            df = super(PlotView, self).get_df_on_conditions()
+            enriched_genes = self.get_enriched_genes(df, logFC_threshold)
+
+            # 4 list included: gene, hypo_probe_count, hyper_probe_count, total_count
+            enriched_genes_list = enriched_genes.values.T.tolist() 
+
+            return jsonify(enriched_genes_list)
+
+        ori_df, filter_df, dmp_class_list = super(PlotView, self).get_data_from_csv()
+        
         
         with localconverter(ro.default_converter + pandas2ri.converter):
             r_dataframe = ro.conversion.py2rpy(ori_df)
@@ -256,7 +266,24 @@ class PlotView(MainView):
         plot_url = base64.b64encode(res.getvalue()).decode()
         content = '<img src="data:image/png;base64,{}">'.format(plot_url)
        
-        return render_template("base/plots.html", img_url=plot_url)                       
+        return render_template("base/plots.html", img_url=plot_url)    
+
+    def get_enriched_genes(self, df, logFC_threshold):
+        df = df[df["gene"] != ""]
+        df = df[df["logFC"].abs() >= logFC_threshold]
+        df["pos_oder_neg"] = np.sign(df["logFC"]) # add a new column to designate the sign of logFC
+        # gene_probe_num = df.groupby(["gene"]).size().reset_index(name="counts")
+        # gene_probe_num = gene_probe_num.sort_values(by="counts", ascending=False)
+
+        gene_probe_num = df.groupby("gene").pos_oder_neg.value_counts().unstack()
+        gene_probe_num = gene_probe_num.fillna(0)
+        gene_probe_num = gene_probe_num.astype('int64')
+        gene_probe_num = gene_probe_num.reset_index()
+        gene_probe_num["counts"] = gene_probe_num.iloc[:, 1] + gene_probe_num.iloc[:, 2]
+        gene_probe_num = gene_probe_num.sort_values(by="counts", ascending=False)
+        enriched_genes = gene_probe_num.iloc[:50] # return the top 50 enriched genes
+
+        return enriched_genes
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))

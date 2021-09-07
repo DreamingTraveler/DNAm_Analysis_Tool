@@ -10,11 +10,15 @@
   </div>
   <div class="dropdown-menu" id="plot-type-dropdown-menu" role="menu">
     <div class="dropdown-content">
-      <a href="#" data-plot-type="volcano" class="dropdown-item">
+      <!-- <a href="#" data-plot-type="volcano" class="dropdown-item">
         Volcano plot
-      </a>
+      </a> -->
       <a href="#" data-plot-type="subjectNum" class="dropdown-item">
         Subject number plot 
+      </a>
+
+      <a href="#" data-plot-type="enrichedGenePlot" class="dropdown-item">
+        Enriched gene plot 
       </a>
     </div>
   </div>
@@ -41,6 +45,7 @@
 
 	  <div id="chart-container"></div>
 	</div>
+	<div id="enriched-gene-plot"></div>
 </div>
 <!-- <div hidden id="hidden-loader"> -->
 <div class="loader-wrapper">
@@ -118,6 +123,73 @@
   	});
 	}
 
+	function loadPage(data, plotType) {
+		$.ajax({
+			url: '{{ url_for("main.PlotView") }}',
+	    type: 'GET',
+	    success: function(content) {
+	    	$("#dmp-info-area").html(content);
+
+	    	if (plotType == "enrichedGenePlot") {
+	    		genEnrichedGenePlot(data);
+	    	}
+	    }
+		});
+	}
+
+	function genEnrichedGenePlot(data) {
+		var geneList = data[0];
+		var hypoProbeCount = data[1];
+		var hyperProbeCount = data[2];
+
+		Highcharts.chart("enriched-gene-plot", {
+			chart: {
+				type: "column",
+    		height: "60%"
+			},
+			title: {
+				text: "The top 50 enriched genes"
+			},
+	    xAxis: {
+	        categories: geneList
+	    },
+	    yAxis: {
+        min: 0,
+        title: {
+            text: 'Probe count'
+        },
+        stackLabels: {
+            enabled: true,
+            style: {
+                fontWeight: 'bold',
+                color: ( // theme
+                    Highcharts.defaultOptions.title.style &&
+                    Highcharts.defaultOptions.title.style.color
+                ) || 'gray'
+            }
+        }
+    	},
+    	plotOptions: {
+        column: {
+            stacking: 'normal'
+        }
+    	},
+    	tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    	},
+    	series: [
+    	{
+    		name: "Hypo",
+    		data: hypoProbeCount
+    	},
+    	{
+    		name: "Hyper",
+    		data: hyperProbeCount
+    	}]
+		});
+	}
+
 	function updatePlots() {
 		if ($("#plot-display-opt").hasClass("is-active")) {
 			$.ajax({
@@ -129,10 +201,19 @@
 	      	$("#dmp-info-area").html(loaderHtml);
 	      	setLoaderActive();
 	      },
-        success: function(block) {
+        success: function(data) {
         	// $("#plot-display-area").css("display", "block");
         	$("#dmp-info-area > .loader-wrapper").remove();
-        	$("#dmp-info-area").html(block);
+
+        	var plotType = $.cookie('plotOption');
+
+        	if (plotType == "volcano") {
+        		$("#dmp-info-area").html(data);
+        	}
+
+        	else {
+        		loadPage(data, plotType);
+        	}
         },
         error: function(response) {
           console.log(response);
@@ -148,14 +229,14 @@
 	function updateChart() {
 		var cancerType = $.cookie('cancerType');
 		var pheno = $('input[name=plot-radio]:checked').val();
-		var chart = $("#chart-container").highcharts();
+		var subNumChart = $("#chart-container").highcharts();
 		var subInfo = colorectalSubInfo;
 
-		chart.setTitle(null, { text: "Colorectal cancer"});
+		subNumChart.setTitle(null, { text: "Colorectal cancer"});
 
 		if (cancerType == "bladder") {
 			subInfo = bladderSubInfo;
-			chart.setTitle(null, { text: "Bladder cancer"});
+			subNumChart.setTitle(null, { text: "Bladder cancer"});
 		}
 
 		var newData = [
@@ -171,11 +252,20 @@
 			]
 		}
 
-		chart.series[0].setData(newData);
+		subNumChart.series[0].setData(newData);
 	}
 
 	$("#cancer-option a").click(function() {
-		updateChart();
+		var plotType = $.cookie('plotOption');
+
+		if (plotType == "enrichedGenePlot") {
+			updatePlots();
+		}
+
+		else if (plotType == "subjectNum") {
+			updateChart();
+		}
+		
 	})
 
 	$("#plot-pheno-options").change(function() {
@@ -195,12 +285,24 @@
 
 		$.cookie('plotOption', type);
 		if (type == "volcano") {
+			$("#subject-num-plot").css("display", "none");
+			$("#volcano-plot").css("display", "block");
+			$("#enriched-gene-plot").css("display", "none");
 			updatePlots();
 		}
 
 		else if (type == "subjectNum") {
 			$("#subject-num-plot").css("display", "block");
 			$("#volcano-plot").css("display", "none");
+			$("#enriched-gene-plot").css("display", "none");
+			updateChart();
+		}
+
+		else if (type == "enrichedGenePlot") {
+			$("#subject-num-plot").css("display", "none");
+			$("#volcano-plot").css("display", "none");
+			$("#enriched-gene-plot").css("display", "block");
+			updatePlots();
 		}
 	});
 

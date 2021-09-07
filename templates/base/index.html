@@ -158,6 +158,7 @@
 			{% block plot %} {% endblock %}
 			{% block dmp_table %} {% endblock %}
 		</div>
+
 		<div hidden id="hidden-loader">
 			<div class="loader-wrapper">
 			    <div class="loader is-loading"></div>
@@ -285,7 +286,11 @@
 		function updatePlots() {
 			var plotType = $.cookie('plotOption');
 
-			if ($("#plot-display-opt").hasClass("is-active") && plotType == "volcano") {
+			if (plotType != "volcano") {
+				return
+			}
+
+			if ($("#plot-display-opt").hasClass("is-active")) {
 				$.ajax({
 	    	  url: '{{ url_for("main.PlotView") }}',
 		      type: 'POST',
@@ -419,13 +424,14 @@
 		})
 
 		$("#dmp-table-link").click(function() {
+			$.removeCookie('plotOption')
 			updateTableContent();
 		})
 
 		$("#plot-view-link").click(function() {
 			$.ajax({
     	  url: '{{ url_for("main.PlotView") }}',
-	      type: 'POST',
+	      type: 'GET',
         success: function(block) {
         	$("#dmp-info-area").html(block);
         },
