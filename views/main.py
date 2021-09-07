@@ -244,10 +244,7 @@ class PlotView(MainView):
 
         if plot_opt == "enrichedGenePlot":
             df = super(PlotView, self).get_df_on_conditions()
-            enriched_genes = self.get_enriched_genes(df, logFC_threshold)
-
-            # 4 list included: gene, hypo_probe_count, hyper_probe_count, total_count
-            enriched_genes_list = enriched_genes.values.T.tolist() 
+            enriched_genes_list = self.get_enriched_genes(df, logFC_threshold)
 
             return jsonify(enriched_genes_list)
 
@@ -275,15 +272,28 @@ class PlotView(MainView):
         # gene_probe_num = df.groupby(["gene"]).size().reset_index(name="counts")
         # gene_probe_num = gene_probe_num.sort_values(by="counts", ascending=False)
 
+        if df.empty == True:
+            return []
+
         gene_probe_num = df.groupby("gene").pos_oder_neg.value_counts().unstack()
         gene_probe_num = gene_probe_num.fillna(0)
         gene_probe_num = gene_probe_num.astype('int64')
         gene_probe_num = gene_probe_num.reset_index()
+        cols = list(gene_probe_num.columns)
+        if -1.0 not in cols: # only hyper
+            gene_probe_num[-1.0] = 0
+        elif 1.0 not in cols:
+            gene_probe_num[1.0] = 0
+            
         gene_probe_num["counts"] = gene_probe_num.iloc[:, 1] + gene_probe_num.iloc[:, 2]
         gene_probe_num = gene_probe_num.sort_values(by="counts", ascending=False)
+        gene_probe_num = gene_probe_num[["gene", -1.0, 1.0, "counts"]] # rearrange columns
         enriched_genes = gene_probe_num.iloc[:50] # return the top 50 enriched genes
 
-        return enriched_genes
+        # 4 list included: gene, hypo_probe_count, hyper_probe_count, total_count
+        enriched_genes_list = enriched_genes.values.T.tolist() 
+
+        return enriched_genes_list
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))

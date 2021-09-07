@@ -4,8 +4,9 @@ $(document).ready(function () {
       	$(".navbar-menu").toggleClass("is-active");
     });
 
-    $(".panel-tabs").click(function() {
-    	$(".panel-tabs > a").toggleClass("is-active");
+    $(".panel-tabs > a").click(function() {
+    	$(".panel-tabs > a").removeClass("is-active");
+    	$(this).addClass("is-active");
     })
 });
 

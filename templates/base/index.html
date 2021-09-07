@@ -393,12 +393,11 @@
 		// change logFC threshold
 		$("#logFC-threshold").on("input", function() {
 			var threshold = $(this).val();
-
+			
 			$.cookie('page', 1);
 			$.cookie('logFCThreshold', threshold);
 			$("#threshold-val").html("Threshold value: " + threshold)
 
-			updatePlots();
 			updateTableContent();
 		})
 

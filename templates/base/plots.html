@@ -73,6 +73,8 @@
 		lateStage: 276
 	};
 
+	var finishedLoad = false; // a flag to indicate whether the page has loaded
+
 	Highcharts.chart("chart-container", {
 		chart: {
       type: 'item',
@@ -124,17 +126,19 @@
 	}
 
 	function loadPage(data, plotType) {
-		$.ajax({
-			url: '{{ url_for("main.PlotView") }}',
-	    type: 'GET',
-	    success: function(content) {
-	    	$("#dmp-info-area").html(content);
-
+		if (!finishedLoad) {
+			$.ajax({
+				url: '{{ url_for("main.PlotView") }}',
+		    type: 'GET'
+			}).done(function (content) {
+				$("#dmp-info-area").html(content);
+				finishedLoad = true;
 	    	if (plotType == "enrichedGenePlot") {
 	    		genEnrichedGenePlot(data);
 	    	}
-	    }
-		});
+			});
+		}
+		
 	}
 
 	function genEnrichedGenePlot(data) {
@@ -200,24 +204,20 @@
 	      	// $("#plot-display-area").css("display", "none");
 	      	$("#dmp-info-area").html(loaderHtml);
 	      	setLoaderActive();
-	      },
-        success: function(data) {
-        	// $("#plot-display-area").css("display", "block");
-        	$("#dmp-info-area > .loader-wrapper").remove();
+	      }
+	    }).done(function (data) {
+	    	// $("#plot-display-area").css("display", "block");
+      	$("#dmp-info-area > .loader-wrapper").remove();
 
-        	var plotType = $.cookie('plotOption');
+      	var plotType = $.cookie('plotOption');
 
-        	if (plotType == "volcano") {
-        		$("#dmp-info-area").html(data);
-        	}
+      	if (plotType == "volcano") {
+      		$("#dmp-info-area").html(data);
+      	}
 
-        	else {
-        		loadPage(data, plotType);
-        	}
-        },
-        error: function(response) {
-          console.log(response);
-        } 
+      	else {
+      		loadPage(data, plotType);
+      	}
 	    });
 	  }
 
@@ -254,6 +254,23 @@
 
 		subNumChart.series[0].setData(newData);
 	}
+
+	var lock = false;
+	$("#logFC-threshold").on("input", function() {
+		var threshold = $(this).val();
+		var plotType = $.cookie('plotOption');
+		
+		
+		$.cookie('logFCThreshold', threshold);
+		$("#threshold-val").html("Threshold value: " + threshold)
+
+		if (plotType == "enrichedGenePlot") {
+			if (!lock) {
+				updatePlots();
+				lock = true;
+			}
+		}
+	})
 
 	$("#cancer-option a").click(function() {
 		var plotType = $.cookie('plotOption');
