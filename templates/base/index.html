@@ -234,6 +234,7 @@
 
 		function updateTableContent() {
 			if ($("#dmp-table-opt").hasClass("is-active")){
+				
 				$.ajax({
 	    	  url: '{{ url_for("main.MainView") }}',
 		      type: 'POST',
@@ -244,10 +245,13 @@
 	          console.log(response);
 	        } 
 		    });
+		    console.log("DS")
+		    return
 			}
 
 			else {
 				setTimeout(updateTableContent, 500);
+
 			}
 		}
 
@@ -391,7 +395,7 @@
 		})
 
 		// change logFC threshold
-		$("#logFC-threshold").on("input", function() {
+		$("#logFC-threshold").on("input", _.debounce(function() {
 			var threshold = $(this).val();
 			
 			$.cookie('page', 1);
@@ -399,7 +403,7 @@
 			$("#threshold-val").html("Threshold value: " + threshold)
 
 			updateTableContent();
-		})
+		}, 200))
 
 		// hyper, hypo switches
 		$("#is-hyper, #is-hypo").change(function() {

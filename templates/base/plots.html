@@ -149,7 +149,8 @@
 		Highcharts.chart("enriched-gene-plot", {
 			chart: {
 				type: "column",
-    		height: "60%"
+    		height: "60%",
+    		zoomType: "x"
 			},
 			title: {
 				text: "The top 50 enriched genes"
@@ -256,7 +257,9 @@
 	}
 
 	var lock = false;
-	$("#logFC-threshold").on("input", function() {
+
+	//_.debounce => only get the value at the end of input event
+	$("#logFC-threshold").on("input", _.debounce(function() { 
 		var threshold = $(this).val();
 		var plotType = $.cookie('plotOption');
 		
@@ -270,13 +273,16 @@
 				lock = true;
 			}
 		}
-	})
+	}, 250))
 
 	$("#cancer-option a").click(function() {
 		var plotType = $.cookie('plotOption');
 
 		if (plotType == "enrichedGenePlot") {
-			updatePlots();
+			if (!lock) {
+				updatePlots();
+				lock = true;
+			}
 		}
 
 		else if (plotType == "subjectNum") {

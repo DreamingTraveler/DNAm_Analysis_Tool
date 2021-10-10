@@ -203,7 +203,6 @@ class SaveDMPView(MainView):
             string_df = io.StringIO(intersect_df)
             result_df = pd.read_csv(string_df,
                 sep=r"\s+", escapechar='\\', engine='python')
-            print(result_df)
 
         if file_type == "xlsx":
             out = io.BytesIO()
@@ -239,8 +238,8 @@ class PlotView(MainView):
             logFC_threshold = 0.0
         else:
             logFC_threshold = float(logFC_threshold)
-            if logFC_threshold == 0.0:
-                logFC_threshold = 0.5  
+            # if logFC_threshold == 0.0:
+            #     logFC_threshold = 0.5  
 
         if plot_opt == "enrichedGenePlot":
             df = super(PlotView, self).get_df_on_conditions()
