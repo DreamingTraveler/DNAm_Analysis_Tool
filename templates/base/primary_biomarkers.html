@@ -8,22 +8,34 @@
       <th><abbr title="adjusted p-value">adj.p-val</abbr></th>
       <th>gene</th>
       <th>feat.cgi</th>
+      <th>detail</th>
     </tr>
   </thead>
   <tbody>
     {% for biomarker in biomarker_list %}
     <tr>
-      <th>{{biomarker.probe_id}}</th>
+      <th class="probeID">{{biomarker.probe_id}}</th>
       <td>{{biomarker.beta_diff}}</td>
       <td>{{biomarker.t_val}}</td>
       <td>{{biomarker.p_val}}</td>
       <td>{{biomarker.gene}}</td>
       <td>{{biomarker.feat_cgi}}</td>
+      <td><button class="button is-inverted is-warning is-light biomarker-detail-btn" data-idx="{{ loop.index-1 }}"><i class="fas fa-info-circle"></i></button></td>
     </tr>
+      
     {% endfor %}
-  </tbody>
-
+    
+  </tbody>  
 </table>
+
+<div class="modal" id="biomarker-detail-modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div id="delta-beta-box-plot"></div>
+    <!-- Any other Bulma elements you want -->
+  </div>
+  <button class="modal-close is-large" aria-label="close"></button>
+</div>
 
 <div class="block">
 	<div class="box" style="width: 30%; display: inline-block;">
@@ -47,6 +59,9 @@
     $.ajax({
       url: '{{ url_for("main.PrimaryBiomarkersView") }}',
       type: 'POST',
+      data: {
+        option: ""
+      },
       success: function(block)
       {
         $("#dmp-info-area").html(block);
@@ -56,6 +71,63 @@
         console.log(response);
       } 
     });
+  }
+
+  function showBoxPlot(data, subjectIdx) {
+    console.log(data)
+    Highcharts.chart('delta-beta-box-plot', {
+      chart: {
+          type: 'boxplot'
+      },
+
+      title: {
+          text: 'Beta difference box plot'
+      },
+
+      legend: {
+          enabled: false
+      },
+
+      xAxis: {
+          categories: ['Normal', 'Tumor'],
+          title: {
+              text: 'Subject groups'
+          }
+      },
+
+      yAxis: {
+          title: {
+              text: 'Beta difference'
+          }
+          // plotLines: [{
+          //     value: 932,
+          //     color: 'red',
+          //     width: 1,
+          //     label: {
+          //         text: 'Theoretical mean: 932',
+          //         align: 'center',
+          //         style: {
+          //             color: 'gray'
+          //         }
+          //     }
+          // }]
+      },
+
+      plotOptions: {
+        boxplot: {
+          cropThreshold: 500
+        }
+      },
+
+      series: [{
+          name: 'Beta difference',
+          data: [
+            data[0][subjectIdx], // 0 -> normal
+            data[1][subjectIdx] // 1 -> tumor
+          ]
+      }]
+    });
+    
   }
 
   function setLoaderActive() {
@@ -72,6 +144,33 @@
     $.cookie('page', page);
 
     updateTableContent();
+  })
+
+  $(".biomarker-detail-btn").click(function() {
+    $("#biomarker-detail-modal").addClass("is-active")
+
+    var subjectIdx = $(this).data("idx")
+
+    $.ajax({
+      url: '{{ url_for("main.PrimaryBiomarkersView") }}',
+      type: 'POST',
+      data: {
+        option: "boxPlot"
+      },
+      success: function(data)
+      {
+        showBoxPlot(data, subjectIdx)
+      },
+      error: function(response)
+      {
+        console.log(response);
+      } 
+    });
+
+  });
+
+  $(".modal-close").click(function() {
+    $(this).parent().removeClass("is-active")
   })
 
 })();

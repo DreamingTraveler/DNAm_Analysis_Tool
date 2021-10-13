@@ -9,33 +9,40 @@ SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "adj.P.Val", "CHR", \
 PRIMARY_BIOMARKERS_COLUMNS = ["Probe_ID", "beta_diff", "t", "adj.P.Val", \
 "gene", "feat.cgi"]
 
-# primary biomarker info
-COLORECTAL_PRIMARY_BIOMARKER_CSV = "static/data/colorectal/colorectal_primary_biomarkers.csv"
+DATA_PATH = "static/data/"
 
 # colorectal cancer DNAm analysis result files
-COLORECTAL_DMP_CSV = "static/data/colorectal/colorectal_DMP_analysis_result_TN.csv"
+COLORECTAL_DMP_CSV = DATA_PATH + "colorectal/colorectal_DMP_analysis_result_TN.csv"
+
+# primary biomarker info
+COLORECTAL_PRIMARY_BIOMARKER_CSV = DATA_PATH + "colorectal/colorectal_primary_biomarkers.csv"
+COLORECTAL_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF = \
+	DATA_PATH + "colorectal/colorectal_primary_biomarkers_normal_beta_diff.csv"
+
+COLORECTAL_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF = \
+	DATA_PATH + "colorectal/colorectal_primary_biomarkers_tumor_beta_diff.csv"
 
 # racial data
-COLORECTAL_ASIAN_DMP_CSV = "static/data/colorectal/colorectal_asian_DMP_analysis_result_TN.csv"
-COLORECTAL_WHITE_DMP_CSV = "static/data/colorectal/colorectal_white_DMP_analysis_result_TN.csv"
-COLORECTAL_BLACK_DMP_CSV = "static/data/colorectal/colorectal_black_DMP_analysis_result_TN.csv"
+COLORECTAL_ASIAN_DMP_CSV = DATA_PATH + "colorectal/colorectal_asian_DMP_analysis_result_TN.csv"
+COLORECTAL_WHITE_DMP_CSV = DATA_PATH + "colorectal/colorectal_white_DMP_analysis_result_TN.csv"
+COLORECTAL_BLACK_DMP_CSV = DATA_PATH + "colorectal/colorectal_black_DMP_analysis_result_TN.csv"
 
 # stage data
 COLORECTAL_EARLY_STAGE_DMP_CSV = \
-"static/data/colorectal/colorectal_stage_I&II_DMP_analysis_result_TN.csv"
+DATA_PATH + "colorectal/colorectal_stage_I&II_DMP_analysis_result_TN.csv"
 COLORECTAL_LATE_STAGE_DMP_CSV = \
-"static/data/colorectal/colorectal_stage_III&IV_DMP_analysis_result_TN.csv"
+DATA_PATH + "colorectal/colorectal_stage_III&IV_DMP_analysis_result_TN.csv"
 
 # bladder
-BLADDER_DMP_CSV = "static/data/bladder/bladder_DMP_analysis_result_TN.csv"
+BLADDER_DMP_CSV = DATA_PATH + "bladder/bladder_DMP_analysis_result_TN.csv"
 
 # racial data
-BLADDER_ASIAN_DMP_CSV = "static/data/bladder/bladder_asian_DMP_analysis_result_TN.csv"
-BLADDER_WHITE_DMP_CSV = "static/data/bladder/bladder_white_DMP_analysis_result_TN.csv"
-BLADDER_BLACK_DMP_CSV = "static/data/bladder/bladder_black_DMP_analysis_result_TN.csv"
+BLADDER_ASIAN_DMP_CSV = DATA_PATH + "bladder/bladder_asian_DMP_analysis_result_TN.csv"
+BLADDER_WHITE_DMP_CSV = DATA_PATH + "bladder/bladder_white_DMP_analysis_result_TN.csv"
+BLADDER_BLACK_DMP_CSV = DATA_PATH + "bladder/bladder_black_DMP_analysis_result_TN.csv"
 
 # stage data
 BLADDER_EARLY_STAGE_DMP_CSV = \
-"static/data/bladder/bladder_stage_I&II_DMP_analysis_result_TN.csv"
+DATA_PATH + "bladder/bladder_stage_I&II_DMP_analysis_result_TN.csv"
 BLADDER_LATE_STAGE_DMP_CSV = \
-"static/data/bladder/bladder_stage_III&IV_DMP_analysis_result_TN.csv"
+DATA_PATH + "bladder/bladder_stage_III&IV_DMP_analysis_result_TN.csv"

@@ -398,22 +398,55 @@ class PrimaryBiomarkersView(MainView):
 
         return sub_df, filter_df, biomarker_class_list
 
+    def get_box_plot_data(self, df):
+        data_list = []
+        Q1 = df.quantile(0.25, axis=1).values.tolist()
+        Q3 = df.quantile(0.75, axis=1).values.tolist()
+        max_val = df.max(axis=1).values.tolist()
+        min_val = df.min(axis=1).values.tolist()
+        median = df.median(axis=1).values.tolist()
+        
+        data_list.append(min_val)
+        data_list.append(Q1)
+        data_list.append(median)
+        data_list.append(Q3)
+        data_list.append(max_val)
+
+        return np.array(data_list).transpose().tolist()
     def post(self):
-        _, filter_biomarker_df, biomarker_class_list = self.get_data_from_csv()
-        page, max_biomarker_num, biomarker_per_page, total_page = \
-            super(PrimaryBiomarkersView, self).get_page_info(biomarker_class_list)
+        option = request.form["option"]
 
-        biomarker_class_sublist = \
-            super(PrimaryBiomarkersView, self).get_dmp_list_for_target_page(page, \
-                max_biomarker_num, biomarker_per_page, biomarker_class_list)
+        if option != "":
+            """
+            box plot data: 2 * 252 * 5
+            2: tumor, normal
+            252: #primary biomarkers
+            5: min, Q1, median, Q3, max
+            """
+            normal_bd_df = biomarker_tables.colorectal_normal_beta_diff_df
+            tumor_bd_df = biomarker_tables.colorectal_tumor_beta_diff_df
+            normal_box_plot_data = self.get_box_plot_data(normal_bd_df)
+            tumor_box_plot_data = self.get_box_plot_data(tumor_bd_df)
+            box_plot_data = [normal_box_plot_data, tumor_box_plot_data]
 
-        probe_num = len(biomarker_class_list)
-        gene_num = filter_biomarker_df["gene"].nunique()
+            return jsonify(box_plot_data)
 
-        return render_template('base/primary_biomarkers.html', 
-            biomarker_list=biomarker_class_sublist, 
-            page=page, total_page=total_page, probe_num=probe_num,
-            gene_num=gene_num)
+        else:
+            _, filter_biomarker_df, biomarker_class_list = self.get_data_from_csv()
+            page, max_biomarker_num, biomarker_per_page, total_page = \
+                super(PrimaryBiomarkersView, self).get_page_info(biomarker_class_list)
+
+            biomarker_class_sublist = \
+                super(PrimaryBiomarkersView, self).get_dmp_list_for_target_page(page, \
+                    max_biomarker_num, biomarker_per_page, biomarker_class_list)
+
+            probe_num = len(biomarker_class_list)
+            gene_num = filter_biomarker_df["gene"].nunique()
+
+            return render_template('base/primary_biomarkers.html', 
+                biomarker_list=biomarker_class_sublist, 
+                page=page, total_page=total_page, probe_num=probe_num,
+                gene_num=gene_num)
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))

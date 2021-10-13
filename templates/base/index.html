@@ -466,6 +466,9 @@
 			$.ajax({
     	  url: '{{ url_for("main.PrimaryBiomarkersView") }}',
 	      type: 'POST',
+	      data: {
+	      	option: ""
+	      },
         success: function(block) {
         	$("#dmp-info-area").html(block);
         },
