@@ -131,19 +131,19 @@
 	<section class="column" id="res-display-opetions">
 		<div class="tabs is-boxed">
 		  <ul id="res-options-list">
-		    <li class="is-active" id="dmp-table-opt">
+		    <li class="is-active" id="dmp-table-opt" data-option="dmpTable">
 		      <a id="dmp-table-link">
 		        <span>DMPs table</span>
 		      </a>
 		    </li>
-		    <li id="plot-display-opt">
+		    <li id="plot-display-opt" data-option="plot">
 		      <a id="plot-view-link">
 		        <span>Statistical plots</span>
 		      </a>
 		    </li>
-		    <li>
+		    <li id="primary-biomarkers" data-option="priBiomarkers">
 		      <a>
-		        <span>???</span>
+		        <span>Primary biomarkers</span>
 		      </a>
 		    </li>
 		    <li>
@@ -157,6 +157,7 @@
 		<div id="dmp-info-area">
 			{% block plot %} {% endblock %}
 			{% block dmp_table %} {% endblock %}
+			{% block primary_biomarkers %} {% endblock %}
 		</div>
 
 		<div hidden id="hidden-loader">
@@ -245,8 +246,21 @@
 	          console.log(response);
 	        } 
 		    });
-		    console.log("DS")
+
 		    return
+			}
+
+			else if ($("#primary-biomarkers").hasClass("is-active")){
+				$.ajax({
+	    	  url: '{{ url_for("main.PrimaryBiomarkersView") }}',
+		      type: 'POST',
+	        success: function(block) {
+	        		$("#dmp-info-area").html(block);
+	        },
+	        error: function(response) {
+	          console.log(response);
+	        } 
+		    });
 			}
 
 			else {
@@ -424,10 +438,13 @@
 		$("#res-options-list > li").click(function() {
 			$("#res-options-list > li").removeClass("is-active");
 			$(this).addClass("is-active");
+			var resultOpt = $(this).data("option");
+			$.cookie('resultOption', resultOpt);
 		})
 
 		$("#dmp-table-link").click(function() {
-			$.removeCookie('plotOption')
+			$.removeCookie('plotOption');
+			$("#logFC-threshold").prop("disabled", false);
 			updateTableContent();
 		})
 
@@ -443,6 +460,21 @@
         } 
 	    });
 			// updatePlots();
+		})
+
+		$("#primary-biomarkers > a").click(function() {
+			$.ajax({
+    	  url: '{{ url_for("main.PrimaryBiomarkersView") }}',
+	      type: 'POST',
+        success: function(block) {
+        	$("#dmp-info-area").html(block);
+        },
+        error: function(response) {
+          console.log(response);
+        } 
+	    });
+
+	    $("#logFC-threshold").prop("disabled", true);
 		})
 
 

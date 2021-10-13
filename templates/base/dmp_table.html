@@ -3,9 +3,9 @@
   <thead>
     <tr>
       <th>Probe ID</th>
-      <th><abbr title="log2 fold change">logFC</abbr></th>
+      <th><abbr title="beta difference">Δβ</abbr></th>
       <th><abbr title="t value">t</abbr></th>
-      <th>P.Value</th>
+      <th><abbr title="adjusted p-value">adj.p-val</abbr></th>
       <th><abbr title="Chromosome">CHR</abbr></th>
       <th><abbr title="Map information">MAPINFO</abbr></th>
       <th>gene</th>
@@ -16,7 +16,7 @@
     {% for dmp in dmp_list %}
     <tr>
       <th>{{dmp.probe_id}}</th>
-      <td>{{dmp.logFC}}</td>
+      <td>{{dmp.beta_diff}}</td>
       <td>{{dmp.t_val}}</td>
       <td>{{dmp.p_val}}</td>
       <td>{{dmp.chr}}</td>

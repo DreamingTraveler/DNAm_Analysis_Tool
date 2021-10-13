@@ -4,8 +4,13 @@ SECRET_KEY = 'c882369d7b66e8697426c3e8fb2675c0'
 UPLOAD_FOLDER = './static/upload/dmp_tables_operation'
 ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
 
-SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "P.Value", "CHR", \
+SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "adj.P.Val", "CHR", \
 "MAPINFO", "gene", "feat.cgi", "feature", "cgi"]
+PRIMARY_BIOMARKERS_COLUMNS = ["Probe_ID", "beta_diff", "t", "adj.P.Val", \
+"gene", "feat.cgi"]
+
+# primary biomarker info
+COLORECTAL_PRIMARY_BIOMARKER_CSV = "static/data/colorectal/colorectal_primary_biomarkers.csv"
 
 # colorectal cancer DNAm analysis result files
 COLORECTAL_DMP_CSV = "static/data/colorectal/colorectal_DMP_analysis_result_TN.csv"

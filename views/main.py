@@ -20,17 +20,27 @@ from flask.views import MethodView
 
 blueprint = Blueprint('main', __name__)
 dmp_tables = util.DMPTables()
+biomarker_tables = util.BiomarkerTables()
 
 class DMP():
     def __init__(self, dmp):
         self.probe_id = dmp[0]
-        self.logFC = '{:.5}'.format(dmp[1])
+        self.beta_diff = '{:.5}'.format(dmp[1])
         self.t_val = '{:.5}'.format(dmp[2])
         self.p_val = '{:.2e}'.format(dmp[3])
         self.chr = dmp[4]
         self.coord = dmp[5]
         self.gene = dmp[6]
         self.feat_cgi = dmp[7]
+
+class Biomarker():
+    def __init__(self, dmp):
+        self.probe_id = dmp[0]
+        self.beta_diff = '{:.5}'.format(dmp[1])
+        self.t_val = '{:.5}'.format(dmp[2])
+        self.p_val = '{:.2e}'.format(dmp[3])
+        self.gene = dmp[4]
+        self.feat_cgi = dmp[5]
 
 class MainView(MethodView):
     def get(self):
@@ -294,6 +304,118 @@ class PlotView(MainView):
 
         return enriched_genes_list
 
+class PrimaryBiomarkersView(MainView):
+    def get_df_on_conditions(self):
+        input_csv = ""
+        df = None
+        cancer_type = request.cookies.get('cancerType')
+        race = request.cookies.get('raceOption')
+        stage = request.cookies.get('stageOption')
+
+        if cancer_type == "bladder":
+            pass
+            # df = dmp_tables.bladder_dmp_df
+
+            # if race is not None:
+            #     if race == "asian":
+            #         df = dmp_tables.bladder_asian_dmp_df
+            #     elif race == "white":
+            #         df = dmp_tables.bladder_white_dmp_df
+            #     elif race == "black":
+            #         df = dmp_tables.bladder_black_dmp_df
+
+            # if stage is not None:
+            #     if stage == "early":
+            #         df = dmp_tables.bladder_early_stage_dmp_df
+            #     elif stage == "late":
+            #         df = dmp_tables.bladder_late_stage_dmp_df
+
+        else:
+            df = biomarker_tables.colorectal_primary_biomarker_df
+
+            # if race is not None:
+            #     if race == "asian":
+            #         df = dmp_tables.colorectal_asian_dmp_df
+            #     elif race == "white":
+            #         df = dmp_tables.colorectal_white_dmp_df
+            #     elif race == "black":
+            #         df = dmp_tables.colorectal_black_dmp_df
+
+            # if stage is not None:
+            #     if stage == "early":
+            #         df = dmp_tables.colorectal_early_stage_dmp_df
+            #     elif stage == "late":
+            #         df = dmp_tables.colorectal_late_stage_dmp_df
+
+        return df
+
+    def get_filter_dmp(self, df):
+        filter_text = request.cookies.get('searchFilterText')
+        filter_opt = request.cookies.get('searchFilterOption')
+        logFC_threshold = request.cookies.get('logFCThreshold')
+        is_hyper = request.cookies.get('isHyper')
+        is_hypo = request.cookies.get('isHypo')
+
+        filter_text_list = []
+
+        if logFC_threshold == None:
+            logFC_threshold = 0.0
+        else:
+            logFC_threshold = float(logFC_threshold)
+
+        # filter by methylation status
+        if is_hyper == "false" and is_hypo == "false":
+            df = df.iloc[0:0]
+        elif is_hyper == "false":
+            df = df[df["beta_diff"] < 0]
+        elif is_hypo == "false":
+            df = df[df["beta_diff"] >= 0]
+
+
+        if not filter_text:
+            return df
+        else:
+            filter_text_list = filter_text.split("%2C")
+
+        if filter_opt == "probe":
+            return df[df["Probe_ID"].str.contains('|'.join(filter_text_list))]
+
+        elif filter_opt == "gene":
+            # return df[df["gene"].str.contains('|'.join(filter_text_list), na=False)]
+            return df[df["gene"].isin(filter_text_list)]
+
+        return df
+
+    def get_data_from_csv(self):
+        df = self.get_df_on_conditions()
+        sub_df = df[config.PRIMARY_BIOMARKERS_COLUMNS]
+        filter_df = self.get_filter_dmp(sub_df)
+        biomarker_list = filter_df.values
+        biomarker_class_list = []
+        
+        for biomarker in biomarker_list:
+            biomarker_class_list.append(Biomarker(biomarker))
+
+        return sub_df, filter_df, biomarker_class_list
+
+    def post(self):
+        _, filter_biomarker_df, biomarker_class_list = self.get_data_from_csv()
+        page, max_biomarker_num, biomarker_per_page, total_page = \
+            super(PrimaryBiomarkersView, self).get_page_info(biomarker_class_list)
+
+        biomarker_class_sublist = \
+            super(PrimaryBiomarkersView, self).get_dmp_list_for_target_page(page, \
+                max_biomarker_num, biomarker_per_page, biomarker_class_list)
+
+        probe_num = len(biomarker_class_list)
+        gene_num = filter_biomarker_df["gene"].nunique()
+
+        return render_template('base/primary_biomarkers.html', 
+            biomarker_list=biomarker_class_sublist, 
+            page=page, total_page=total_page, probe_num=probe_num,
+            gene_num=gene_num)
+
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))
 blueprint.add_url_rule('/save', view_func=SaveDMPView.as_view(SaveDMPView.__name__))
+blueprint.add_url_rule('/primaryBiomarker', view_func=PrimaryBiomarkersView.as_view(PrimaryBiomarkersView.__name__))

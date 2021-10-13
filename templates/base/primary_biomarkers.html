@@ -1,0 +1,78 @@
+{% block primary_biomarkers %} 
+<table class="table is-striped" id="dmp-display-table">
+  <thead>
+    <tr>
+      <th>Probe ID</th>
+      <th><abbr title="beta difference">Δβ</abbr></th>
+      <th><abbr title="t value">t</abbr></th>
+      <th><abbr title="adjusted p-value">adj.p-val</abbr></th>
+      <th>gene</th>
+      <th>feat.cgi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for biomarker in biomarker_list %}
+    <tr>
+      <th>{{biomarker.probe_id}}</th>
+      <td>{{biomarker.beta_diff}}</td>
+      <td>{{biomarker.t_val}}</td>
+      <td>{{biomarker.p_val}}</td>
+      <td>{{biomarker.gene}}</td>
+      <td>{{biomarker.feat_cgi}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
+
+<div class="block">
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Probe: {{ probe_num }}
+	</div>
+
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Gene: {{ gene_num }}
+	</div>
+	
+</div>
+{% from 'base/pagination.html' import pagination %}
+{% set page = page | int %}
+{% set total_page = total_page | int %}
+{{ pagination(page, total_page) }}
+{% endblock %}
+
+<script type="text/javascript">
+(function() {
+  function updateTableContent() {
+    $.ajax({
+      url: '{{ url_for("main.PrimaryBiomarkersView") }}',
+      type: 'POST',
+      success: function(block)
+      {
+        $("#dmp-info-area").html(block);
+      },
+      error: function(response)
+      {
+        console.log(response);
+      } 
+    });
+  }
+
+  function setLoaderActive() {
+    $("#save-dmp-table > .loader-wrapper").css("display", "block");
+    $("#save-dmp-table > .loader-wrapper > .loader").css({
+      "height" : "30px",
+      "width" : "30px"
+    })
+  }
+
+  $(".pagination-link").click(function(event) {
+    event.preventDefault();
+    var page = $(this).data("page")
+    $.cookie('page', page);
+
+    updateTableContent();
+  })
+
+})();
+</script>
