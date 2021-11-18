@@ -80,7 +80,7 @@
 	  </div>
 
 	  <p class="panel-block">
-	  	<p style="text-align: center;">abs(logFC) threshold</p>
+	  	<p style="text-align: center;">|Δβ| threshold</p>
 	    <input class="slider is-fullwidth" id="logFC-threshold" step="0.01" min="0" max="1" value="0" type="range">
 	    <p style="text-align: center; margin-bottom: 10px;" id="threshold-val">Threshold value: 0 </p>
 	  </p>
@@ -254,6 +254,9 @@
 				$.ajax({
 	    	  url: '{{ url_for("main.PrimaryBiomarkersView") }}',
 		      type: 'POST',
+		      data: {
+		        option: ""
+		      },
 	        success: function(block) {
 	        		$("#dmp-info-area").html(block);
 	        },
@@ -449,6 +452,8 @@
 		})
 
 		$("#plot-view-link").click(function() {
+			$.removeCookie('plotOption');
+			$("#logFC-threshold").prop("disabled", false);
 			$.ajax({
     	  url: '{{ url_for("main.PlotView") }}',
 	      type: 'GET',

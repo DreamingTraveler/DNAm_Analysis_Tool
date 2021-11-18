@@ -396,7 +396,26 @@ class PrimaryBiomarkersView(MainView):
         for biomarker in biomarker_list:
             biomarker_class_list.append(Biomarker(biomarker))
 
-        return sub_df, filter_df, biomarker_class_list
+        # data for chromosome visualization
+        vis_data = filter_df[["gene", "chr", "coord", "is_candidate"]]
+        gene_list = []
+
+        for idx, dmp in enumerate(vis_data.values):
+            gene_name = dmp[0]
+            chromosome = str(dmp[1])
+            gene_coord = dmp[2]
+            is_candidate = dmp[3]
+            color = "#000000" # primary
+
+            if is_candidate:
+                color = "#800000"
+
+            gene = {'name': gene_name, 'chr': chromosome, 'start': int(gene_coord), 'stop': int(gene_coord)+1,\
+                    'color': color}
+            gene_list.append(gene)
+
+
+        return gene_list, filter_df, biomarker_class_list
 
     def get_box_plot_data(self, df):
         data_list = []
@@ -432,7 +451,7 @@ class PrimaryBiomarkersView(MainView):
             return jsonify(box_plot_data)
 
         else:
-            _, filter_biomarker_df, biomarker_class_list = self.get_data_from_csv()
+            vis_data, filter_biomarker_df, biomarker_class_list = self.get_data_from_csv()
             page, max_biomarker_num, biomarker_per_page, total_page = \
                 super(PrimaryBiomarkersView, self).get_page_info(biomarker_class_list)
 
@@ -446,7 +465,7 @@ class PrimaryBiomarkersView(MainView):
             return render_template('base/primary_biomarkers.html', 
                 biomarker_list=biomarker_class_sublist, 
                 page=page, total_page=total_page, probe_num=probe_num,
-                gene_num=gene_num)
+                gene_num=gene_num, vis_data=str(vis_data))
 
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))
