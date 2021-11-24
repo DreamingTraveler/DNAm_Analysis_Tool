@@ -21,6 +21,15 @@ class DMPTables():
 		self.bladder_early_stage_dmp_df = pd.read_csv(config.BLADDER_EARLY_STAGE_DMP_CSV)
 		self.bladder_late_stage_dmp_df = pd.read_csv(config.BLADDER_LATE_STAGE_DMP_CSV)
 
+		# lung
+		self.lung_dmp_df = pd.read_csv(config.LUNG_DMP_CSV)
+
+		# liver
+		self.liver_dmp_df = pd.read_csv(config.LIVER_DMP_CSV)
+
+		# pancreas
+		self.pancreas_dmp_df = pd.read_csv(config.PANCREAS_DMP_CSV)
+
 class BiomarkerTables():
 	def __init__(self):
 		self.colorectal_primary_biomarker_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_CSV)

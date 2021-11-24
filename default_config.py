@@ -7,7 +7,7 @@ ALLOWED_EXTENSIONS = {'xlsx', 'csv'}
 SUB_DF_COLUMNS = ["Probe_ID", "logFC", "t", "adj.P.Val", "CHR", \
 "MAPINFO", "gene", "feat.cgi", "feature", "cgi"]
 PRIMARY_BIOMARKERS_COLUMNS = ["Probe_ID", "beta_diff", "t", "adj.P.Val", \
-"gene", "feat.cgi"]
+"gene", "feat.cgi", "chr", "coord", "is_candidate"]
 
 DATA_PATH = "static/data/"
 
@@ -46,3 +46,12 @@ BLADDER_EARLY_STAGE_DMP_CSV = \
 DATA_PATH + "bladder/bladder_stage_I&II_DMP_analysis_result_TN.csv"
 BLADDER_LATE_STAGE_DMP_CSV = \
 DATA_PATH + "bladder/bladder_stage_III&IV_DMP_analysis_result_TN.csv"
+
+# lung
+LUNG_DMP_CSV = DATA_PATH + "lung/lung_DMP_analysis_result_TN.csv"
+
+# liver
+LIVER_DMP_CSV = DATA_PATH + "liver/liver_DMP_analysis_result_TN.csv"
+
+# pancreas
+PANCREAS_DMP_CSV = DATA_PATH + "pancreas/pancreas_DMP_analysis_result_TN.csv"

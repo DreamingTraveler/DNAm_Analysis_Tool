@@ -87,6 +87,15 @@ class MainView(MethodView):
                 elif stage == "late":
                     df = dmp_tables.bladder_late_stage_dmp_df
 
+        elif cancer_type == "lung":
+            df = dmp_tables.lung_dmp_df
+
+        elif cancer_type == "liver":
+            df = dmp_tables.liver_dmp_df
+
+        elif cancer_type == "pancreas":
+            df = dmp_tables.pancreas_dmp_df
+
         else:
             df = dmp_tables.colorectal_dmp_df
 
