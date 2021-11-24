@@ -6,7 +6,8 @@
 	<title>{% block title %}DNAm analysis{% endblock %}</title>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/v4-shims.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"> -->
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma.min.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma-slider.min.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bulma-switch.min.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/basic.css') }}">
@@ -18,7 +19,7 @@
 	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 	<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
 	<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bulma-tagsinput@2.0.0/dist/js/bulma-tagsinput.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bulma-tagsinput@2.0.0/dist/js/bulma-tagsinput.min.js"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/ideogram@1.31.0/dist/js/ideogram.min.js"></script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/highcharts-more.js"></script>
@@ -26,6 +27,7 @@
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	<script src="https://code.highcharts.com/modules/export-data.js"></script>
 	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+	<script src="{{ url_for('static', filename='js/bulma-tagsinput.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/bulma-slider.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.fileDownload.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
@@ -65,7 +67,7 @@
 			</span>
 	      </a>
 
-	      <div class="navbar-item has-dropdown is-hoverable">
+	      <!-- <div class="navbar-item has-dropdown is-hoverable">
 	        <a class="navbar-link  has-text-white-ter">
 	          More
 	        </a>
@@ -85,7 +87,7 @@
 	            Report an issue
 	          </a>
 	        </div>
-	      </div>
+	      </div> -->
 	    </div>
 
 	  </div>
