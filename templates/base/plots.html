@@ -29,12 +29,14 @@
 		{% if img_url %}
 		<img src="data:image/png;base64,{{ img_url }}">
 		{% endif %}
-		<!-- {{ content }} -->
 	</div>
 	<div id="subject-num-plot">
 		<div class="panel-block" id="plot-pheno-options">
 	  	<div class="field">
 	  		<!-- <label><b>Race:</b></label> -->
+	  		<input class="is-checkradio" id="plot-radio-no" type="radio" name="plot-radio" value="no">
+			  <label for="plot-radio-no">No classification</label>
+
 			  <input class="is-checkradio" id="plot-radio-race" type="radio" name="plot-radio" value="race" checked="checked">
 			  <label for="plot-radio-race">Race</label>
 
@@ -58,6 +60,8 @@
 <script type="text/javascript">
 (function() {
 	var colorectalSubInfo = {
+		tumor: 314,
+		normal: 38,
 		asian: 12,
 		white: 219,
 		black: 62,
@@ -66,6 +70,8 @@
 	};
 
 	var bladderSubInfo = {
+		tumor: 419,
+		normal: 21,
 		asian: 44,
 		white: 335,
 		black: 23,
@@ -145,6 +151,7 @@
 		var geneList = data[0];
 		var hypoProbeCount = data[1];
 		var hyperProbeCount = data[2];
+		var geneNum = geneList.length;
 
 		Highcharts.chart("enriched-gene-plot", {
 			chart: {
@@ -153,7 +160,7 @@
     		zoomType: "x"
 			},
 			title: {
-				text: "The top 50 enriched genes"
+				text: "The top " + geneNum + " enriched genes"
 			},
 	    xAxis: {
 	        categories: geneList
@@ -233,6 +240,7 @@
 		var subNumChart = $("#chart-container").highcharts();
 		var subInfo = colorectalSubInfo;
 
+		subNumChart.series[0].setData([]);
 		subNumChart.setTitle(null, { text: "Colorectal cancer"});
 
 		if (cancerType == "bladder") {
@@ -253,7 +261,15 @@
 			]
 		}
 
+		if (pheno == "no") {
+			newData = [
+				["Tumor", subInfo.tumor, "#a10322", "Tumor"],
+				["Normal", subInfo.normal, "#2184ed", "Normal"]
+			]
+		}
+
 		subNumChart.series[0].setData(newData);
+
 	}
 
 	var lock = false;
