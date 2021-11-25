@@ -26,16 +26,20 @@
     </tr>
   </thead>
   <tbody>
-    {% for biomarker in biomarker_list %}
-    <tr>
-      <th>{{biomarker.probe_id}}</th>
-      <td>{{biomarker.beta_diff}}</td>
-      <td>{{biomarker.t_val}}</td>
-      <td>{{biomarker.p_val}}</td>
-      <td>{{biomarker.gene}}</td>
-      <td>{{biomarker.feat_cgi}}</td>
-      <td><button class="button is-inverted is-warning is-light biomarker-detail-btn" data-idx="{{ loop.index-1 }}" data-probe="{{biomarker.probe_id}}" data-gene="{{biomarker.gene}}"><i class="fas fa-info-circle"></i></button></td>
-    </tr>
+    {% for biomarker in biomarker_list %}  
+      <tr>
+      {% if biomarker.is_candidate %}
+        <th style="color: #800000;">{{biomarker.probe_id}}</th>
+      {% else %}
+        <th style="color: #000000;">{{biomarker.probe_id}}</th>
+      {% endif %}
+        <td>{{biomarker.beta_diff}}</td>
+        <td>{{biomarker.t_val}}</td>
+        <td>{{biomarker.p_val}}</td>
+        <td>{{biomarker.gene}}</td>
+        <td>{{biomarker.feat_cgi}}</td>
+        <td><button class="button is-inverted is-warning is-light biomarker-detail-btn" data-idx="{{ loop.index-1 }}" data-probe="{{biomarker.probe_id}}" data-gene="{{biomarker.gene}}"><i class="fas fa-info-circle"></i></button></td>
+      </tr>
       
     {% endfor %}
     
