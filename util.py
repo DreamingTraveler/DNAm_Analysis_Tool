@@ -35,6 +35,10 @@ class BiomarkerTables():
 		self.colorectal_primary_biomarker_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_CSV)
 		self.colorectal_normal_beta_diff_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF, index_col=0)
 		self.colorectal_tumor_beta_diff_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF, index_col=0)
+
+		self.lung_primary_biomarker_df = pd.read_csv(config.LUNG_PRIMARY_BIOMARKER_CSV)
+		self.lung_normal_beta_diff_df = pd.read_csv(config.LUNG_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF, index_col=0)
+		self.lung_tumor_beta_diff_df = pd.read_csv(config.LUNG_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF, index_col=0)
 		# self.colorectal_asian_dmp_df = pd.read_csv(config.COLORECTAL_ASIAN_DMP_CSV)
 		# self.colorectal_white_dmp_df = pd.read_csv(config.COLORECTAL_WHITE_DMP_CSV)
 		# self.colorectal_black_dmp_df = pd.read_csv(config.COLORECTAL_BLACK_DMP_CSV)

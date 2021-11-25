@@ -49,6 +49,13 @@ DATA_PATH + "bladder/bladder_stage_III&IV_DMP_analysis_result_TN.csv"
 
 # lung
 LUNG_DMP_CSV = DATA_PATH + "lung/lung_DMP_analysis_result_TN.csv"
+# primary biomarker info
+LUNG_PRIMARY_BIOMARKER_CSV = DATA_PATH + "lung/lung_primary_biomarkers.csv"
+LUNG_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF = \
+	DATA_PATH + "lung/lung_primary_biomarkers_normal_beta_diff.csv"
+
+LUNG_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF = \
+	DATA_PATH + "lung/lung_primary_biomarkers_tumor_beta_diff.csv"
 
 # liver
 LIVER_DMP_CSV = DATA_PATH + "liver/liver_DMP_analysis_result_TN.csv"

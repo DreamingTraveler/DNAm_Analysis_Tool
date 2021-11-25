@@ -41,6 +41,7 @@ class Biomarker():
         self.p_val = '{:.2e}'.format(dmp[3])
         self.gene = dmp[4]
         self.feat_cgi = dmp[5]
+        self.is_candidate = dmp[8]
 
 class MainView(MethodView):
     def get(self):
@@ -339,22 +340,13 @@ class PrimaryBiomarkersView(MainView):
             #     elif stage == "late":
             #         df = dmp_tables.bladder_late_stage_dmp_df
 
-        else:
+        elif cancer_type == "colorectal":
             df = biomarker_tables.colorectal_primary_biomarker_df
 
-            # if race is not None:
-            #     if race == "asian":
-            #         df = dmp_tables.colorectal_asian_dmp_df
-            #     elif race == "white":
-            #         df = dmp_tables.colorectal_white_dmp_df
-            #     elif race == "black":
-            #         df = dmp_tables.colorectal_black_dmp_df
-
-            # if stage is not None:
-            #     if stage == "early":
-            #         df = dmp_tables.colorectal_early_stage_dmp_df
-            #     elif stage == "late":
-            #         df = dmp_tables.colorectal_late_stage_dmp_df
+        elif cancer_type == "lung":
+            df = biomarker_tables.lung_primary_biomarker_df
+        else:
+            df = biomarker_tables.colorectal_primary_biomarker_df
 
         return df
 
@@ -451,8 +443,16 @@ class PrimaryBiomarkersView(MainView):
             252: #primary biomarkers
             5: min, Q1, median, Q3, max
             """
+            cancer_type = request.cookies.get('cancerType')
+
             normal_bd_df = biomarker_tables.colorectal_normal_beta_diff_df
             tumor_bd_df = biomarker_tables.colorectal_tumor_beta_diff_df
+
+            if cancer_type == "lung":
+                normal_bd_df = biomarker_tables.lung_normal_beta_diff_df
+                tumor_bd_df = biomarker_tables.lung_tumor_beta_diff_df
+ 
+
             normal_box_plot_data = self.get_box_plot_data(normal_bd_df)
             tumor_box_plot_data = self.get_box_plot_data(tumor_bd_df)
             box_plot_data = [normal_box_plot_data, tumor_box_plot_data]
