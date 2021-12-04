@@ -41,6 +41,8 @@ class Biomarker():
         self.p_val = '{:.2e}'.format(dmp[3])
         self.gene = dmp[4]
         self.feat_cgi = dmp[5]
+        self.chr = dmp[6]
+        self.coord = dmp[7]
         self.is_candidate = dmp[8]
 
 class MainView(MethodView):
@@ -445,12 +447,12 @@ class PrimaryBiomarkersView(MainView):
             """
             cancer_type = request.cookies.get('cancerType')
 
-            normal_bd_df = biomarker_tables.colorectal_normal_beta_diff_df
-            tumor_bd_df = biomarker_tables.colorectal_tumor_beta_diff_df
+            normal_bd_df = biomarker_tables.colorectal_normal_beta_df
+            tumor_bd_df = biomarker_tables.colorectal_tumor_beta_df
 
             if cancer_type == "lung":
-                normal_bd_df = biomarker_tables.lung_normal_beta_diff_df
-                tumor_bd_df = biomarker_tables.lung_tumor_beta_diff_df
+                normal_bd_df = biomarker_tables.lung_normal_beta_df
+                tumor_bd_df = biomarker_tables.lung_tumor_beta_df
  
 
             normal_box_plot_data = self.get_box_plot_data(normal_bd_df)

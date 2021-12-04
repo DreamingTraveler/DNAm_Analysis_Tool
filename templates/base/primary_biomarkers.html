@@ -13,7 +13,7 @@
   <button class="modal-close is-large" aria-label="close"></button>
 </div>
 
-<table class="table is-striped" id="dmp-display-table">
+<!-- <table class="table is-striped" id="dmp-display-table">
   <thead>
     <tr>
       <th>Probe ID</th>
@@ -44,16 +44,74 @@
     {% endfor %}
     
   </tbody>  
-</table>
+</table> -->
+<div class="columns is-multiline is-mobile" id="biomarker-display-area">
+{% for biomarker in biomarker_list %}
+  {% if biomarker.is_candidate %}
+  <div class="card column is-4-mobile is-3-tablet is-2-widescreen" style="background-image: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);" data-idx="{{ loop.index-1 }}" data-probe="{{biomarker.probe_id}}" data-gene="{{biomarker.gene}}">
+  {% else %}
+  <div class="card column is-4-mobile is-3-tablet is-2-widescreen" data-idx="{{ loop.index-1 }}" data-probe="{{biomarker.probe_id}}" data-gene="{{biomarker.gene}}">
+  {% endif %}
+    <div class="card-content">
+      <div class="media">
+        <div class="media-content" style="overflow: hidden;">
+          <p class="title is-6">{{biomarker.gene}}</p>
+          <p class="subtitle is-7">{{biomarker.probe_id}}</p>
+        </div>
+      </div>
 
-<div class="modal" id="biomarker-detail-modal">
-  <div class="modal-background"></div>
-  <div class="modal-content">
-    <div id="delta-beta-box-plot"></div>
-    <!-- Any other Bulma elements you want -->
+      <!-- <div class="content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+        <a href="#">#css</a> <a href="#">#responsive</a>
+        <br>
+        <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+      </div> -->
+    </div>
   </div>
-  <button class="modal-close is-large" aria-label="close"></button>
+
+  <div class="modal" id="biomarker-detail-modal-{{ loop.index-1 }}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">{{biomarker.gene}}</p>
+      </header>
+      <section class="modal-card-body">
+        <div id="beta-box-plot-{{ loop.index-1 }}"></div>
+        <!-- Any other Bulma elements you want -->
+        <div>
+          <table class="table is-striped" >
+            <thead>
+              <tr>
+                <th><abbr title="beta difference">Δβ</abbr></th>
+                <th><abbr title="t value">t</abbr></th>
+                <th><abbr title="adjusted p-value">adj.p-val</abbr></th>
+                <th>feat.cgi</th>
+                <th><abbr title="Chromosome">CHR</abbr></th>
+                <th><abbr title="Map information">MAPINFO</abbr></th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>{{biomarker.beta_diff}}</td>
+                  <td>{{biomarker.t_val}}</td>
+                  <td>{{biomarker.p_val}}</td>
+                  <td>{{biomarker.feat_cgi}}</td>
+                  <td>{{biomarker.chr}}</td>
+                  <td>{{biomarker.coord}}</td>
+                </tr>         
+            </tbody>  
+          </table>
+        </div>
+      </section>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+  </div>
+
+{% endfor %}
 </div>
+
+
 
 <div class="block">
 	<div class="box" style="width: 30%; display: inline-block;">
@@ -116,13 +174,13 @@
   }
 
   function showBoxPlot(data, subjectIdx, gene) {
-    Highcharts.chart('delta-beta-box-plot', {
+    Highcharts.chart('beta-box-plot-'+subjectIdx, {
       chart: {
         type: 'boxplot'
       },
 
       title: {
-        text: 'Beta difference box plot'
+        text: 'Beta value box plot'
       },
 
       subtitle: {
@@ -142,7 +200,7 @@
 
       yAxis: {
         title: {
-          text: 'Beta difference'
+          text: 'Beta value'
         }
       },
 
@@ -153,7 +211,7 @@
       },
 
       series: [{
-        name: 'Beta difference',
+        name: 'Beta value',
         data: [
           data[0][subjectIdx], // 0 -> normal
           data[1][subjectIdx] // 1 -> tumor
@@ -179,11 +237,11 @@
     updateTableContent();
   })
 
-  $(".biomarker-detail-btn").click(function() {
-    $("#biomarker-detail-modal").addClass("is-active");
-
+  $("#biomarker-display-area .card").click(function() {
     var subjectIdx = $(this).data("idx");
     var gene = $(this).data("gene");
+
+    $("#biomarker-detail-modal-"+subjectIdx).addClass("is-active");
 
     $.ajax({
       url: '{{ url_for("main.PrimaryBiomarkersView") }}',

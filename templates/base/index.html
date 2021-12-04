@@ -6,13 +6,42 @@
 	    Differential Methylation Positions (DMPs) Overview
 	  </p>
 
-	  <p class="panel-tabs" id="cancer-option">
+	  <div class="panel-block dropdown is-hoverable" id="cancer-dropdown">
+		  <div class="dropdown-trigger">
+		    <button class="button" id="pheno-button" aria-haspopup="true" aria-controls="dropdown-menu3">
+		      <span id="cancer-type">Colorectal</span>
+		      <span class="icon is-small">
+		        <i class="fas fa-angle-down" aria-hidden="true"></i>
+		      </span>
+		    </button>
+		  </div>
+		  <div class="dropdown-menu" id="cancer-menu" role="menu">
+		    <div class="dropdown-content" id="cancer-content">
+		      <a href="#" class="dropdown-item" data-cancer-type="colorectal">Colorectal</a>
+			    <!-- <a data-cancer-type="bladder">Bladder</a> -->
+			    <a href="#" class="dropdown-item" data-cancer-type="lung">Lung</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="liver">Liver</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+			    <a href="#" class="dropdown-item" data-cancer-type="pancreas">Pancreas</a>
+		    </div>
+		  </div>
+		</div>
+
+	  <!-- <p class="panel-tabs is-toggle" id="cancer-option">
 	    <a class="is-active" data-cancer-type="colorectal">Colorectal</a>
-	    <!-- <a data-cancer-type="bladder">Bladder</a> -->
 	    <a data-cancer-type="lung">Lung</a>
 	    <a data-cancer-type="liver">Liver</a>
 	    <a data-cancer-type="pancreas">Pancreas</a>
-	  </p>
+	    <a data-cancer-type="pancreas">Pancreas</a>
+	    <a data-cancer-type="pancreas">Pancreas</a>
+	    <a data-cancer-type="pancreas">Pancreas</a>
+	    <a data-cancer-type="pancreas">Pancreas</a>
+	    <a data-cancer-type="pancreas">Pancreas</a>
+	  </p> -->
 
 	  <div class="panel-block">
 	  	<div class="control has-icons-left" id="search-dmp">
@@ -33,7 +62,7 @@
 			</div>
 		</div>
 
-  	<div class="panel-block dropdown is-hoverable" id="pheno-dropdown">
+  	<!-- <div class="panel-block dropdown is-hoverable" id="pheno-dropdown">
 		  <div class="dropdown-trigger">
 		    <button class="button" id="pheno-button" aria-haspopup="true" aria-controls="dropdown-menu3">
 		      <span id="pheno-text">Select Phenotype</span>
@@ -55,7 +84,7 @@
 		      </a>
 		    </div>
 		  </div>
-		</div>
+		</div> -->
 	  
 	  <div class="panel-block pheno-options" id="race-options">
 	  	<div class="field">
@@ -345,9 +374,10 @@
 
 		// ----- Left panel -----
 		// select cancer type
-		$("#cancer-option > a").click(function() {
+		$("#cancer-content > a").click(function() {
 			var cancerType = $(this).data("cancer-type");
 			$.cookie('cancerType', cancerType);
+			$("#cancer-type").html($(this).html())
 
 			updatePlots();
 			updateTableContent();

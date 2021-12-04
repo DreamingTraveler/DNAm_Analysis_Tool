@@ -16,11 +16,11 @@ COLORECTAL_DMP_CSV = DATA_PATH + "colorectal/colorectal_DMP_analysis_result_TN.c
 
 # primary biomarker info
 COLORECTAL_PRIMARY_BIOMARKER_CSV = DATA_PATH + "colorectal/colorectal_primary_biomarkers.csv"
-COLORECTAL_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF = \
-	DATA_PATH + "colorectal/colorectal_primary_biomarkers_normal_beta_diff.csv"
+COLORECTAL_PRIMARY_BIOMARKER_NORMAL_BETA = \
+	DATA_PATH + "colorectal/colorectal_primary_biomarkers_normal_beta.csv"
 
-COLORECTAL_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF = \
-	DATA_PATH + "colorectal/colorectal_primary_biomarkers_tumor_beta_diff.csv"
+COLORECTAL_PRIMARY_BIOMARKER_TUMOR_BETA = \
+	DATA_PATH + "colorectal/colorectal_primary_biomarkers_tumor_beta.csv"
 
 # racial data
 COLORECTAL_ASIAN_DMP_CSV = DATA_PATH + "colorectal/colorectal_asian_DMP_analysis_result_TN.csv"
@@ -51,11 +51,11 @@ DATA_PATH + "bladder/bladder_stage_III&IV_DMP_analysis_result_TN.csv"
 LUNG_DMP_CSV = DATA_PATH + "lung/lung_DMP_analysis_result_TN.csv"
 # primary biomarker info
 LUNG_PRIMARY_BIOMARKER_CSV = DATA_PATH + "lung/lung_primary_biomarkers.csv"
-LUNG_PRIMARY_BIOMARKER_NORMAL_BETA_DIFF = \
-	DATA_PATH + "lung/lung_primary_biomarkers_normal_beta_diff.csv"
+LUNG_PRIMARY_BIOMARKER_NORMAL_BETA = \
+	DATA_PATH + "lung/lung_primary_biomarkers_normal_beta.csv"
 
-LUNG_PRIMARY_BIOMARKER_TUMOR_BETA_DIFF = \
-	DATA_PATH + "lung/lung_primary_biomarkers_tumor_beta_diff.csv"
+LUNG_PRIMARY_BIOMARKER_TUMOR_BETA = \
+	DATA_PATH + "lung/lung_primary_biomarkers_tumor_beta.csv"
 
 # liver
 LIVER_DMP_CSV = DATA_PATH + "liver/liver_DMP_analysis_result_TN.csv"
