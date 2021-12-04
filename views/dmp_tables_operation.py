@@ -69,8 +69,11 @@ class UploadfileView(MethodView):
 			op_target = "gene"
 
 		
-		target_df = df_list[0][op_target] if operation == "intersection" \
-								else df_list[0]
+		# target_df = df_list[0][op_target] if operation == "intersection" \
+		# 						else df_list[0]
+
+		target_df = df_list[0]
+		
 		concat_df = None
 
 		for df in df_list[1:]:
