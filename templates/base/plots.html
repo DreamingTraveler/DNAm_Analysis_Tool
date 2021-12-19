@@ -34,14 +34,14 @@
 		<div class="panel-block" id="plot-pheno-options">
 	  	<div class="field">
 	  		<!-- <label><b>Race:</b></label> -->
-	  		<input class="is-checkradio" id="plot-radio-no" type="radio" name="plot-radio" value="no">
+	  		<input class="is-checkradio" id="plot-radio-no" type="radio" name="plot-radio" value="no" checked="checked">
 			  <label for="plot-radio-no">No classification</label>
 
-			  <input class="is-checkradio" id="plot-radio-race" type="radio" name="plot-radio" value="race" checked="checked">
+			  <!-- <input class="is-checkradio" id="plot-radio-race" type="radio" name="plot-radio" value="race">
 			  <label for="plot-radio-race">Race</label>
 
 			  <input class="is-checkradio" id="plot-radio-stage" type="radio" name="plot-radio" value="stage">
-			  <label for="plot-radio-stage">Stage</label>
+			  <label for="plot-radio-stage">Stage</label> -->
 			</div>
 	  </div>
 
@@ -79,6 +79,21 @@
 		lateStage: 276
 	};
 
+	var lungSubInfo = {
+		tumor: 370,
+		normal: 42
+	};
+
+	var liverSubInfo = {
+		tumor: 380,
+		normal: 50
+	};
+
+	var pancreasSubInfo = {
+		tumor: 185,
+		normal: 10
+	};
+
 	var finishedLoad = false; // a flag to indicate whether the page has loaded
 
 	Highcharts.chart("chart-container", {
@@ -104,9 +119,8 @@
 			name: "Number of tumor subject: ",
 			keys: ["name", "y", "color", "label"],
 			data: [
-				["Asian", colorectalSubInfo.asian, "#a6a04c", "Asian 亞洲人"],
-				["White", colorectalSubInfo.white, "#f5f2c9", "White 白人"],
-				["Black", colorectalSubInfo.black, "#593112", "Black 黑人/非裔美國人"]
+				["Tumor", colorectalSubInfo.tumor, "#a10322", "Tumor"],
+				["Normal", colorectalSubInfo.normal, "#2184ed", "Normal"]
 			],
 			dataLabels: {
         enabled: true,
@@ -242,11 +256,23 @@
 
 		subNumChart.series[0].setData([]);
 		subNumChart.setTitle(null, { text: "Colorectal cancer"});
-
-		if (cancerType == "bladder") {
-			subInfo = bladderSubInfo;
-			subNumChart.setTitle(null, { text: "Bladder cancer"});
+		
+		if (cancerType == "lung") {
+			subInfo = lungSubInfo;
+			subNumChart.setTitle(null, { text: "Lung cancer"});
 		}
+
+		else if (cancerType == "liver") {
+			subInfo = liverSubInfo;
+			subNumChart.setTitle(null, { text: "Liver cancer"});
+		}
+
+
+		else if (cancerType == "pancreas") {
+			subInfo = pancreasSubInfo;
+			subNumChart.setTitle(null, { text: "Pancreas cancer"});
+		}
+
 
 		var newData = [
 			["Asian", subInfo.asian, "#a6a04c", "Asian 亞洲人"],
@@ -254,12 +280,12 @@
 			["Black", subInfo.black, "#593112", "Black 黑人/非裔美國人"]
 		]
 
-		if (pheno == "stage") {
-			newData = [
-				["Early Stage (I&II)", subInfo.earlyStage, "#d6963c", "Early Stage (I&II)"],
-				["Late Stage (III&IV)", subInfo.lateStage, "#a10303", "Late Stage (III&IV)"]
-			]
-		}
+		// if (pheno == "stage") {
+		// 	newData = [
+		// 		["Early Stage (I&II)", subInfo.earlyStage, "#d6963c", "Early Stage (I&II)"],
+		// 		["Late Stage (III&IV)", subInfo.lateStage, "#a10303", "Late Stage (III&IV)"]
+		// 	]
+		// }
 
 		if (pheno == "no") {
 			newData = [
@@ -291,7 +317,7 @@
 		}
 	}, 250))
 
-	$("#cancer-option a").click(function() {
+	$("#cancer-content a").click(function() {
 		var plotType = $.cookie('plotOption');
 
 		if (plotType == "enrichedGenePlot") {

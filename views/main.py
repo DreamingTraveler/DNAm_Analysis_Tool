@@ -347,6 +347,13 @@ class PrimaryBiomarkersView(MainView):
 
         elif cancer_type == "lung":
             df = biomarker_tables.lung_primary_biomarker_df
+
+        elif cancer_type == "liver":
+            df = biomarker_tables.liver_primary_biomarker_df
+
+        elif cancer_type == "pancreas":
+            df = biomarker_tables.pancreas_primary_biomarker_df
+
         else:
             df = biomarker_tables.colorectal_primary_biomarker_df
 
@@ -453,6 +460,14 @@ class PrimaryBiomarkersView(MainView):
             if cancer_type == "lung":
                 normal_bd_df = biomarker_tables.lung_normal_beta_df
                 tumor_bd_df = biomarker_tables.lung_tumor_beta_df
+
+            elif cancer_type == "liver":
+                normal_bd_df = biomarker_tables.liver_normal_beta_df
+                tumor_bd_df = biomarker_tables.liver_tumor_beta_df
+
+            elif cancer_type == "pancreas":
+                normal_bd_df = biomarker_tables.pancreas_normal_beta_df
+                tumor_bd_df = biomarker_tables.pancreas_tumor_beta_df
  
 
             normal_box_plot_data = self.get_box_plot_data(normal_bd_df)

@@ -59,6 +59,19 @@ LUNG_PRIMARY_BIOMARKER_TUMOR_BETA = \
 
 # liver
 LIVER_DMP_CSV = DATA_PATH + "liver/liver_DMP_analysis_result_TN.csv"
+LIVER_PRIMARY_BIOMARKER_CSV = DATA_PATH + "liver/liver_primary_biomarkers.csv"
+LIVER_PRIMARY_BIOMARKER_NORMAL_BETA = \
+	DATA_PATH + "liver/liver_primary_biomarkers_normal_beta.csv"
+
+LIVER_PRIMARY_BIOMARKER_TUMOR_BETA = \
+	DATA_PATH + "liver/liver_primary_biomarkers_tumor_beta.csv"
+
 
 # pancreas
 PANCREAS_DMP_CSV = DATA_PATH + "pancreas/pancreas_DMP_analysis_result_TN.csv"
+PANCREAS_PRIMARY_BIOMARKER_CSV = DATA_PATH + "pancreas/pancreas_primary_biomarkers.csv"
+PANCREAS_PRIMARY_BIOMARKER_NORMAL_BETA = \
+	DATA_PATH + "pancreas/pancreas_primary_biomarkers_normal_beta.csv"
+
+PANCREAS_PRIMARY_BIOMARKER_TUMOR_BETA = \
+	DATA_PATH + "pancreas/pancreas_primary_biomarkers_tumor_beta.csv"
