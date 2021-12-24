@@ -30,6 +30,15 @@ class DMPTables():
 		# pancreas
 		self.pancreas_dmp_df = pd.read_csv(config.PANCREAS_DMP_CSV)
 
+		# prostate
+		self.prostate_dmp_df = pd.read_csv(config.PROSTATE_DMP_CSV)
+
+		# esophagus
+		self.esophagus_dmp_df = pd.read_csv(config.ESOPHAGUS_DMP_CSV)
+
+		# stomach
+		self.stomach_dmp_df = pd.read_csv(config.STOMACH_DMP_CSV)
+
 class BiomarkerTables():
 	def __init__(self):
 		self.colorectal_primary_biomarker_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_CSV)

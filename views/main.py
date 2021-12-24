@@ -99,6 +99,15 @@ class MainView(MethodView):
         elif cancer_type == "pancreas":
             df = dmp_tables.pancreas_dmp_df
 
+        elif cancer_type == "prostate":
+            df = dmp_tables.prostate_dmp_df
+
+        elif cancer_type == "esophagus":
+            df = dmp_tables.esophagus_dmp_df
+
+        elif cancer_type == "stomach":
+            df = dmp_tables.stomach_dmp_df
+
         else:
             df = dmp_tables.colorectal_dmp_df
 
@@ -468,6 +477,14 @@ class PrimaryBiomarkersView(MainView):
             elif cancer_type == "pancreas":
                 normal_bd_df = biomarker_tables.pancreas_normal_beta_df
                 tumor_bd_df = biomarker_tables.pancreas_tumor_beta_df
+
+            # elif cancer_type == "prostate":
+            #     normal_bd_df = biomarker_tables.prostate_normal_beta_df
+            #     tumor_bd_df = biomarker_tables.prostate_tumor_beta_df
+
+            # elif cancer_type == "esophagus":
+            #     normal_bd_df = biomarker_tables.esophagus_normal_beta_df
+            #     tumor_bd_df = biomarker_tables.esophagus_tumor_beta_df
  
 
             normal_box_plot_data = self.get_box_plot_data(normal_bd_df)
