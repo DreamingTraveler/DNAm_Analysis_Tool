@@ -1,0 +1,106 @@
+{% block validation_result %} 
+<table class="table is-striped" id="validation_res_table">
+  <thead>
+    <tr>
+      <th>Probe ID</th>
+      <th>gene</th>
+      <th>optimal Δβ cut-off point</th>
+      <th>accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for biomarker in biomarker_list %}
+    <tr>
+      <th>{{biomarker.probe_id}}</th>
+      <td>{{biomarker.gene}}</td>
+      <td>{{biomarker.optimal_cut_point}}</td>
+      <td>{{biomarker.accuracy}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
+
+<div class="block">
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Probe: {{ probe_num }}
+	</div>
+
+	<div class="box" style="width: 30%; display: inline-block;">
+		Number of Gene: {{ gene_num }}
+	</div>
+
+	<div id="save-dmp-table" style="float: right; margin-right: 7%;">
+		<div class="loader-wrapper">
+		    <div class="loader is-loading"></div>
+		    <p id="pls-wait-txt" style="font-size: 14px; text-align: center;">Please Wait...</p>
+		</div>
+		<div id="save-file-btns" style="display: flex; flex-direction: column; justify-content: center;">
+			<button class="button is-primary is-light" data-ftype="xlsx" id="export-toxlsx-btn">Export to xlsx</button>
+			<button class="button is-primary is-light" data-ftype="csv" id="export-tocsv-btn">Export to csv</button>
+		</div>
+	</div>
+	
+</div>
+{% from 'base/pagination.html' import pagination %}
+{% set page = page | int %}
+{% set total_page = total_page | int %}
+{{ pagination(page, total_page) }}
+{% endblock %}
+
+<script type="text/javascript">
+(function() {
+
+	function updateTableContent() {
+		$.ajax({
+      url: '{{ url_for("main.ValidationResultView") }}',
+      type: 'POST',
+      success: function(block) {
+        $("#dmp-info-area").html(block);
+      },
+      error: function(response) {
+        console.log(response);
+      } 
+    });
+	}
+
+	function setLoaderActive() {
+		$("#save-dmp-table > .loader-wrapper").css("display", "block");
+  	$("#save-dmp-table > .loader-wrapper > .loader").css({
+  		"height" : "30px",
+  		"width" : "30px"
+  	})
+	}
+
+  $(".pagination-link").click(function(event) {
+    event.preventDefault();
+    var page = $(this).data("page")
+    $.cookie('page', page);
+
+    updateTableContent();
+  })
+
+  $("#export-toxlsx-btn, #export-tocsv-btn").click(function() {
+  	$(this).css("display", "none");
+
+  	$.fileDownload('{{ url_for("main.SaveDMPView") }}', {
+			httpMethod: 'POST',
+			data: {
+        fileType : $(this).data("ftype"),
+        df: ""
+      },
+			prepareCallback:function(url) {
+         setLoaderActive()
+      },
+      successCallback: function() {
+      	$("#export-toxlsx-btn, #export-tocsv-btn").css("display", "block");
+      	$("#save-dmp-table > .loader-wrapper").css("display", "none");
+      },
+      failCallback: function() {
+      	alert("File download failed!"); 
+      }
+		});
+  })
+
+})();
+</script>

@@ -176,9 +176,9 @@
 		        <span>Primary biomarkers</span>
 		      </a>
 		    </li>
-		    <li>
+		    <li id="validation-result" data-option="validationRes">
 		      <a>
-		        <span>???</span>
+		        <span>Validation result</span>
 		      </a>
 		    </li>
 		  </ul>
@@ -505,6 +505,21 @@
 	      data: {
 	      	option: ""
 	      },
+        success: function(block) {
+        	$("#dmp-info-area").html(block);
+        },
+        error: function(response) {
+          console.log(response);
+        } 
+	    });
+
+	    $("#logFC-threshold").prop("disabled", true);
+		})
+
+		$("#validation-result > a").click(function() {
+			$.ajax({
+    	  url: '{{ url_for("main.ValidationResultView") }}',
+	      type: 'POST',
         success: function(block) {
         	$("#dmp-info-area").html(block);
         },

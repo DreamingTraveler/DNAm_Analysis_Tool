@@ -3,6 +3,7 @@ import os
 import io
 import urllib
 import config
+import math
 import util
 import base64
 import pandas as pd
@@ -21,6 +22,7 @@ from flask.views import MethodView
 blueprint = Blueprint('main', __name__)
 dmp_tables = util.DMPTables()
 biomarker_tables = util.BiomarkerTables()
+validation_res_tables = util.ValidationResultTables()
 
 class DMP():
     def __init__(self, dmp):
@@ -44,6 +46,16 @@ class Biomarker():
         self.chr = dmp[6]
         self.coord = dmp[7]
         self.is_candidate = dmp[8]
+
+class ValidationRes():
+    def __init__(self, dmp):
+        self.probe_id = dmp[0]
+        self.gene = dmp[1]
+        self.optimal_cut_point = dmp[2]
+        if math.isnan(dmp[3]):
+            self.accuracy = dmp[3]
+        else:
+            self.accuracy = '{:.4}'.format(dmp[3]*100) + ' %'
 
 class MainView(MethodView):
     def get(self):
@@ -510,7 +522,64 @@ class PrimaryBiomarkersView(MainView):
                 page=page, total_page=total_page, probe_num=probe_num,
                 gene_num=gene_num, vis_data=str(vis_data))
 
+class ValidationResultView(MainView):
+    def get_df_on_conditions(self):
+        input_csv = ""
+        df = None
+        cancer_type = request.cookies.get('cancerType')
+
+        if cancer_type == "bladder":
+            pass
+
+        # elif cancer_type == "colorectal":
+        #     df = validation_res_tables.colrectal_validation_result
+
+        # elif cancer_type == "lung":
+        #     df = biomarker_tables.lung_primary_biomarker_df
+
+        # elif cancer_type == "liver":
+        #     df = biomarker_tables.liver_primary_biomarker_df
+
+        # elif cancer_type == "pancreas":
+        #     df = biomarker_tables.pancreas_primary_biomarker_df
+
+        else:
+            df = validation_res_tables.colrectal_validation_result
+
+        return df
+
+    def get_data_from_csv(self):
+        df = self.get_df_on_conditions()
+        # filter_df = self.get_filter_dmp(df)
+        biomarker_list = df.values
+        biomarker_class_list = []
+        
+        for biomarker in biomarker_list:
+            biomarker_class_list.append(ValidationRes(biomarker))
+
+        # data for chromosome visualization
+
+        return df, biomarker_class_list
+
+    def post(self):
+        df, biomarker_class_list = self.get_data_from_csv()
+        page, max_biomarker_num, biomarker_per_page, total_page = \
+            super(ValidationResultView, self).get_page_info(biomarker_class_list)
+
+        biomarker_class_sublist = \
+            super(ValidationResultView, self).get_dmp_list_for_target_page(page, \
+                max_biomarker_num, biomarker_per_page, biomarker_class_list)
+
+        probe_num = len(biomarker_class_list)
+        gene_num = df["gene"].nunique()
+
+        return render_template('base/validation_result.html', 
+            biomarker_list=biomarker_class_sublist, 
+            page=page, total_page=total_page, probe_num=probe_num,
+            gene_num=gene_num)
+
 blueprint.add_url_rule('/', view_func=MainView.as_view(MainView.__name__))
 blueprint.add_url_rule('/plot', view_func=PlotView.as_view(PlotView.__name__))
 blueprint.add_url_rule('/save', view_func=SaveDMPView.as_view(SaveDMPView.__name__))
 blueprint.add_url_rule('/primaryBiomarker', view_func=PrimaryBiomarkersView.as_view(PrimaryBiomarkersView.__name__))
+blueprint.add_url_rule('/validationResult', view_func=ValidationResultView.as_view(ValidationResultView.__name__))

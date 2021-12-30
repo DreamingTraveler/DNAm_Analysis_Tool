@@ -22,6 +22,9 @@ COLORECTAL_PRIMARY_BIOMARKER_NORMAL_BETA = \
 COLORECTAL_PRIMARY_BIOMARKER_TUMOR_BETA = \
 	DATA_PATH + "colorectal/colorectal_primary_biomarkers_tumor_beta.csv"
 
+# validation result
+COLORECTAL_VALIDATION_RESULT = DATA_PATH + "colorectal/colorectal_validation_result.csv"
+
 # racial data
 COLORECTAL_ASIAN_DMP_CSV = DATA_PATH + "colorectal/colorectal_asian_DMP_analysis_result_TN.csv"
 COLORECTAL_WHITE_DMP_CSV = DATA_PATH + "colorectal/colorectal_white_DMP_analysis_result_TN.csv"

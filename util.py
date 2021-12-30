@@ -71,3 +71,7 @@ class BiomarkerTables():
 
 		# self.bladder_early_stage_dmp_df = pd.read_csv(config.BLADDER_EARLY_STAGE_DMP_CSV)
 		# self.bladder_late_stage_dmp_df = pd.read_csv(config.BLADDER_LATE_STAGE_DMP_CSV)
+
+class ValidationResultTables():
+	def __init__(self):
+		self.colrectal_validation_result = pd.read_csv(config.COLORECTAL_VALIDATION_RESULT)
