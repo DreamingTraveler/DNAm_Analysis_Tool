@@ -39,6 +39,12 @@ class DMPTables():
 		# stomach
 		self.stomach_dmp_df = pd.read_csv(config.STOMACH_DMP_CSV)
 
+		# ovarian
+		self.ovarian_dmp_df = pd.read_csv(config.OVARIAN_DMP_CSV)
+
+		# breast
+		self.breast_dmp_df = pd.read_csv(config.BREAST_DMP_CSV)
+
 class BiomarkerTables():
 	def __init__(self):
 		self.colorectal_primary_biomarker_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_CSV)
@@ -75,3 +81,4 @@ class BiomarkerTables():
 class ValidationResultTables():
 	def __init__(self):
 		self.colrectal_validation_result = pd.read_csv(config.COLORECTAL_VALIDATION_RESULT)
+		self.pancreas_validation_result = pd.read_csv(config.PANCREAS_VALIDATION_RESULT)

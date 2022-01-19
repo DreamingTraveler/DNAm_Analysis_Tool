@@ -114,6 +114,12 @@ class MainView(MethodView):
         elif cancer_type == "prostate":
             df = dmp_tables.prostate_dmp_df
 
+        elif cancer_type == "breast":
+            df = dmp_tables.breast_dmp_df
+
+        elif cancer_type == "ovarian":
+            df = dmp_tables.ovarian_dmp_df
+
         elif cancer_type == "esophagus":
             df = dmp_tables.esophagus_dmp_df
 
@@ -535,13 +541,13 @@ class ValidationResultView(MainView):
         #     df = validation_res_tables.colrectal_validation_result
 
         # elif cancer_type == "lung":
-        #     df = biomarker_tables.lung_primary_biomarker_df
+        #     df = validation_res_tables.lung_primary_biomarker_df
 
         # elif cancer_type == "liver":
-        #     df = biomarker_tables.liver_primary_biomarker_df
+        #     df = validation_res_tables.liver_primary_biomarker_df
 
-        # elif cancer_type == "pancreas":
-        #     df = biomarker_tables.pancreas_primary_biomarker_df
+        elif cancer_type == "pancreas":
+            df = validation_res_tables.pancreas_validation_result
 
         else:
             df = validation_res_tables.colrectal_validation_result

@@ -78,7 +78,8 @@ PANCREAS_PRIMARY_BIOMARKER_NORMAL_BETA = \
 
 PANCREAS_PRIMARY_BIOMARKER_TUMOR_BETA = \
 	DATA_PATH + "pancreas/pancreas_primary_biomarkers_tumor_beta.csv"
-
+	
+PANCREAS_VALIDATION_RESULT = DATA_PATH + "pancreas/pancreas_validation_result.csv"
 # prostate
 PROSTATE_DMP_CSV = DATA_PATH + "prostate/prostate_DMP_analysis_result_TN.csv"
 # PROSTATE_PRIMARY_BIOMARKER_CSV = DATA_PATH + "prostate/prostate_primary_biomarkers.csv"
@@ -99,3 +100,9 @@ ESOPHAGUS_DMP_CSV = DATA_PATH + "esophagus/esophagus_DMP_analysis_result_TN.csv"
 
 # stomach
 STOMACH_DMP_CSV = DATA_PATH + "stomach/stomach_DMP_analysis_result_TN.csv"
+
+# ovarian
+OVARIAN_DMP_CSV = DATA_PATH + "ovarian/ovarian_DMP_analysis_result_TN.csv"
+
+# breast
+BREAST_DMP_CSV = DATA_PATH + "breast/breast_DMP_analysis_result_TN.csv"
