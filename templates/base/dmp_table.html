@@ -21,7 +21,9 @@
       <td>{{dmp.p_val}}</td>
       <td>{{dmp.chr}}</td>
       <td>{{dmp.coord}}</td>
-      <td>{{dmp.gene}}</td>
+      <td>
+        <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene={{dmp.gene}}" target="_blank">{{dmp.gene}}</a>
+      </td>
       <td>{{dmp.feat_cgi}}</td>
     </tr>
     {% endfor %}
