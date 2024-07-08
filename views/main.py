@@ -126,6 +126,12 @@ class MainView(MethodView):
         elif cancer_type == "stomach":
             df = dmp_tables.stomach_dmp_df
 
+        elif cancer_type == "osteoporosis":
+            df = dmp_tables.ost_dmp_df
+
+        elif cancer_type == "brain":
+            df = dmp_tables.brain_dmp_df
+
         else:
             df = dmp_tables.colorectal_dmp_df
 

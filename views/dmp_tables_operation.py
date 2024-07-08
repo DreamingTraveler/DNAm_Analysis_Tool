@@ -79,6 +79,8 @@ class UploadfileView(MethodView):
 		for df in df_list[1:]:
 			if operation == "intersection":
 				target_df = pd.merge(target_df, df, how="inner", on=[op_target])
+			elif operation == "left":
+				target_df = pd.merge(target_df, df, how="left", on=[op_target])
 			else: # symmetric diff
 				target_df = pd.concat([target_df, df])
 		

@@ -106,3 +106,9 @@ OVARIAN_DMP_CSV = DATA_PATH + "ovarian/ovarian_DMP_analysis_result_TN.csv"
 
 # breast
 BREAST_DMP_CSV = DATA_PATH + "breast/breast_DMP_analysis_result_TN.csv"
+
+OST_DMP_CSV = DATA_PATH + "osteoporosis/osteoporosis_DMP_analysis_result.csv"
+
+BRAIN_DMP_CSV = DATA_PATH + "brain/brain_DMP_analysis_result.csv"
+
+KIDNEY_DMP_CSV = DATA_PATH + "kidney/kidney_DMP_analysis_result.csv"

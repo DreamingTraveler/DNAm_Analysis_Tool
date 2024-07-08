@@ -45,6 +45,15 @@ class DMPTables():
 		# breast
 		self.breast_dmp_df = pd.read_csv(config.BREAST_DMP_CSV)
 
+		# osteoporosis
+		self.ost_dmp_df = pd.read_csv(config.OST_DMP_CSV)
+
+		# brain
+		self.brain_dmp_df = pd.read_csv(config.BRAIN_DMP_CSV)
+
+		# kidney
+		self.kidney_dmp_df = pd.read_csv(config.KIDNEY_DMP_CSV)
+
 class BiomarkerTables():
 	def __init__(self):
 		self.colorectal_primary_biomarker_df = pd.read_csv(config.COLORECTAL_PRIMARY_BIOMARKER_CSV)
